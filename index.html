@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Luna vs. Marte en números · Exploración espacial</title>
-  <meta name="description" content="Análisis de 96 objetos en la Luna y 37 misiones a Marte con datos públicos del NSSDC de la NASA: cuánto duran, cuánto cuestan y qué rovers recorrieron más." />
+  <meta name="description" content="96 objetos en la Luna y 37 misiones a Marte, con datos públicos del NSSDC de la NASA: cuánto duran, cuánto cuestan y qué rovers recorrieron más." />
+  <meta name="theme-color" content="#05050d" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,20 +14,20 @@
   <style>
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background-color: #0b0605;
+      background-color: #05050d;
       color: #f5f5f5;
     }
-    /* Fondo fijo de toda la página */
-    .page-bg {
-      position: fixed; inset: 0; z-index: -2;
-      background: #2a0f08 url('fondo.jpg') center / cover no-repeat;
+    /* Fondo de estrellas (el mismo de COSMIC TRACE), fijo en toda la página */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: -1;
+      background: #05050d url('fondo.webp') center / cover no-repeat;
+      opacity: .9;
     }
-    .page-shade {
-      position: fixed; inset: 0; z-index: -1;
-      background: linear-gradient(180deg, rgba(10,5,4,0.40) 0%, rgba(10,5,4,0.78) 35%, rgba(8,4,3,0.88) 100%);
-    }
+    .nasa-red { background-color: #e4002b; }
+    .nasa-red-hover:hover { background-color: #c20024; }
+    .nasa-blue { background-color: #2f5fc4; }
     .panel {
-      background: rgba(12, 10, 10, 0.74);
+      background: rgba(12, 12, 18, 0.78);
       border: 1px solid rgba(255, 255, 255, 0.10);
       -webkit-backdrop-filter: blur(6px);
       backdrop-filter: blur(6px);
@@ -35,105 +36,101 @@
       background: rgba(0, 0, 0, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .c-red { background-color: #e4002b; }
-    .c-red-hover:hover { background-color: #c20024; }
-    .c-blue { background-color: #2f5fc4; }
-    .btn-off { border: 1px solid rgba(255,255,255,0.25); color: #e5e5e5; }
-    .btn-off:hover { border-color: #ffffff; }
-    .sec-title { text-shadow: 0 2px 12px rgba(0,0,0,0.6); }
   </style>
 </head>
 <body class="antialiased">
-  <div class="page-bg" aria-hidden="true"></div>
-  <div class="page-shade" aria-hidden="true"></div>
 
-  <header class="sticky top-0 z-40 bg-black/80 backdrop-blur border-b border-white/10 text-white">
+  <!-- HEADER ESTILO NASA.GOV -->
+  <header class="sticky top-0 z-40 bg-black/80 backdrop-blur text-white border-b border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
       <a href="#inicio" class="flex items-center gap-3 shrink-0">
-        <span class="relative flex items-center">
-          <img src="luna.jpg" alt="" class="h-8 w-8 rounded-full object-cover border border-white/20" />
-          <img src="marte.jpg" alt="" class="h-8 w-8 rounded-full object-cover border border-white/20 -ml-2" />
-        </span>
-        <span class="leading-tight">
-          <span class="block text-sm font-bold tracking-tight">Luna vs. Marte</span>
+        <img src="https://nssdc.gsfc.nasa.gov/logo/nasa_logo.gif" alt="Logo oficial de la NASA" class="h-10 w-auto object-contain" />
+        <div class="leading-tight border-l border-white/20 pl-3">
+          <span class="block text-sm font-bold tracking-tight text-white">Luna vs. Marte</span>
           <span class="block text-[11px] text-neutral-400">Exploración espacial en números</span>
-        </span>
+        </div>
       </a>
+
       <nav class="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-semibold overflow-x-auto" aria-label="Navegación principal">
         <a href="#perdidos" class="text-neutral-300 hover:text-white transition whitespace-nowrap">Inventario</a>
         <a href="#duracion" class="text-neutral-300 hover:text-white transition whitespace-nowrap">Cuánto duran</a>
         <a href="#factores" class="text-neutral-300 hover:text-white transition whitespace-nowrap">Qué influye</a>
         <a href="#rovers" class="text-neutral-300 hover:text-white transition whitespace-nowrap">Rovers</a>
         <a href="#grupos" class="text-neutral-300 hover:text-white transition whitespace-nowrap">3 perfiles</a>
-        <a href="#simulador" class="text-red-400 hover:text-white transition whitespace-nowrap">Simulador</a>
-        <a href="#futuro" class="text-neutral-300 hover:text-white transition whitespace-nowrap">Próximas misiones</a>
+        <a href="#simulador" class="text-red-400 hover:text-white transition whitespace-nowrap">Diseña tu nave</a>
+        <a href="#futuro" class="text-neutral-300 hover:text-white transition whitespace-nowrap">Recientes y futuras</a>
       </nav>
     </div>
   </header>
 
-  <!-- INICIO -->
-  <section id="inicio" class="py-16 sm:py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+  <!-- HERO -->
+  <section id="inicio" class="relative text-white py-14 sm:py-20 border-b border-white/10 overflow-hidden">
+    <div class="absolute inset-0 grid grid-cols-2 opacity-35 pointer-events-none">
+      <img src="luna.jpg" alt="Superficie de la Luna" class="w-full h-full object-cover" />
+      <img src="marte.jpg" alt="Planeta Marte" class="w-full h-full object-cover" />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 pointer-events-none"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
       <div class="lg:col-span-7 space-y-4">
-        <p class="text-xs font-bold uppercase tracking-[0.2em] text-red-300">133 misiones · 1959–2026</p>
-        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] sec-title">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-red-400">133 misiones · 1959–2026</p>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1]">
           ¿Qué pasa cuando enviamos naves a la Luna y a Marte?
         </h1>
-        <p class="text-sm sm:text-lg text-neutral-200 leading-relaxed sec-title">
-          Revisamos <strong>96 objetos que llegaron a la Luna</strong> y <strong>37 misiones enviadas a Marte</strong>, con los catálogos públicos del NSSDC de la NASA. Mostramos cuántos se perdieron, cuánto tiempo trabajaron, cuánto costaron y qué rovers recorrieron más.
+        <p class="text-sm sm:text-lg text-neutral-300 leading-relaxed">
+          Juntamos <strong>96 objetos que llegaron a la Luna</strong> y <strong>37 misiones a Marte</strong> a partir de los catálogos públicos del NSSDC de la NASA. Aquí ves cuántos se perdieron, cuánto trabajaron, cuánto costaron y qué rovers llegaron más lejos.
         </p>
         <div class="pt-2 flex flex-wrap gap-3">
-          <a href="#duracion" class="px-5 py-2.5 rounded-sm c-red c-red-hover text-white text-sm font-bold transition">Ver cuánto duran</a>
-          <a href="#rovers" class="px-5 py-2.5 rounded-sm btn-off bg-black/40 text-sm font-bold transition">Récords de rovers</a>
+          <a href="#duracion" class="px-5 py-2.5 rounded-sm nasa-red nasa-red-hover text-white text-sm font-bold transition">Ver cuánto duran</a>
+          <a href="#rovers" class="px-5 py-2.5 rounded-sm border border-white/20 hover:border-white text-white text-sm font-bold transition">Récords de rovers</a>
         </div>
       </div>
 
       <div class="lg:col-span-5 grid grid-cols-2 gap-4">
-        <div class="panel p-5 space-y-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-300">En la Luna</span>
-          <p class="text-3xl sm:text-4xl font-extrabold">96</p>
+        <div class="panel border border-white/10 p-5 space-y-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-400">En la Luna</span>
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">96</p>
           <p class="text-xs text-neutral-400">naves, etapas y objetos registrados desde 1959</p>
         </div>
-        <div class="panel p-5 space-y-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-red-300">En Marte</span>
-          <p class="text-3xl sm:text-4xl font-extrabold">37</p>
+        <div class="panel border border-white/10 p-5 space-y-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-red-400">En Marte</span>
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">37</p>
           <p class="text-xs text-neutral-400">misiones enviadas desde 1962</p>
         </div>
-        <div class="panel p-5 space-y-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">Sin ubicar</span>
-          <p class="text-3xl sm:text-4xl font-extrabold">18</p>
+        <div class="panel border border-white/10 p-5 space-y-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Sin ubicar</span>
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">18</p>
           <p class="text-xs text-neutral-400">objetos en la Luna cuya posición exacta no se conoce</p>
         </div>
-        <div class="panel p-5 space-y-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300">Récord rover</span>
-          <p class="text-3xl sm:text-4xl font-extrabold">45.2 <span class="text-lg">km</span></p>
+        <div class="panel border border-white/10 p-5 space-y-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Récord de rover</span>
+          <p class="text-3xl sm:text-4xl font-extrabold text-white">45.2 <span class="text-lg">km</span></p>
           <p class="text-xs text-neutral-400">recorridos por Perseverance en Marte</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 1. INVENTARIO -->
+  <!-- SECCIÓN 1: OBJETOS PERDIDOS Y RESULTADOS -->
   <section id="perdidos" class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
-      <div class="border-b border-white/15 pb-4">
+      <div class="border-b border-white/10 pb-4">
         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">Inventario</p>
-        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">¿Dónde están las naves que enviamos?</h2>
+        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">¿Dónde están las naves que enviamos?</h2>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Luna -->
-        <div class="panel p-6 space-y-5">
-          <div class="relative h-40 -mx-6 -mt-6 mb-4 overflow-hidden bg-black">
-            <img src="luna.jpg" alt="Fotografía de la Luna" class="w-full h-full object-cover object-center opacity-90" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent"></div>
+        <div class="border border-white/10 panel p-6 space-y-5">
+          <div class="relative h-36 -mx-6 -mt-6 mb-4 overflow-hidden bg-black">
+            <img src="luna.jpg" alt="Fotografía de la Luna" class="w-full h-full object-cover opacity-85" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div class="absolute bottom-3 left-5 right-5 flex items-center justify-between">
-              <h3 class="text-lg font-bold">Luna: 96 objetos</h3>
-              <span class="px-2.5 py-1 text-xs font-bold c-blue rounded-sm">1959–2025</span>
+              <h3 class="text-lg font-bold text-white">Luna: 96 objetos</h3>
+              <span class="px-2.5 py-1 text-xs font-bold text-white nasa-blue rounded-sm">1959–2025</span>
             </div>
           </div>
           <p class="text-sm text-neutral-300">
-            El orbitador LRO de la NASA ha fotografiado la superficie lunar para ubicar dónde cayeron o aterrizaron estas naves:
+            El orbitador LRO de la NASA ha fotografiado la Luna para ubicar dónde cayó o aterrizó cada objeto:
           </p>
           <div class="space-y-3">
             <div>
@@ -141,41 +138,49 @@
                 <span class="text-emerald-400">49 encontrados en fotos (51%)</span>
                 <span class="text-neutral-400">Vistos por LRO</span>
               </div>
-              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden"><div class="h-full bg-emerald-500" style="width: 51%"></div></div>
+              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden">
+                <div class="h-full bg-emerald-600" style="width: 51%"></div>
+              </div>
             </div>
             <div>
               <div class="flex justify-between text-xs font-bold mb-1">
-                <span class="text-neutral-200">29 con ubicación aproximada (30%)</span>
+                <span class="text-neutral-300">29 con ubicación aproximada (30%)</span>
                 <span class="text-neutral-400">Se conoce la zona</span>
               </div>
-              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden"><div class="h-full bg-neutral-400" style="width: 30%"></div></div>
+              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden">
+                <div class="h-full bg-neutral-500" style="width: 30%"></div>
+              </div>
             </div>
             <div>
               <div class="flex justify-between text-xs font-bold mb-1">
                 <span class="text-red-400">18 sin ubicar (19%)</span>
                 <span class="text-neutral-400">Posición desconocida</span>
               </div>
-              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden"><div class="h-full c-red" style="width: 19%"></div></div>
+              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden">
+                <div class="h-full nasa-red" style="width: 19%"></div>
+              </div>
             </div>
           </div>
-          <div class="relative h-44 pt-2"><canvas id="lunaDonutChart"></canvas></div>
+          <div class="relative h-44 pt-2">
+            <canvas id="lunaDonutChart"></canvas>
+          </div>
           <p class="text-xs text-neutral-400 pt-1">
-            Todos los objetos sin ubicar terminaron en impacto, por ejemplo la etapa de ascenso del Apolo 11.
+            Todos los objetos sin ubicar terminaron en impacto, como la etapa de ascenso del Apolo 11.
           </p>
         </div>
 
         <!-- Marte -->
-        <div class="panel p-6 space-y-5">
-          <div class="relative h-40 -mx-6 -mt-6 mb-4 overflow-hidden bg-black">
-            <img src="marte.jpg" alt="Fotografía del planeta Marte" class="w-full h-full object-cover object-center opacity-90" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent"></div>
+        <div class="border border-white/10 panel p-6 space-y-5">
+          <div class="relative h-36 -mx-6 -mt-6 mb-4 overflow-hidden bg-black">
+            <img src="marte.jpg" alt="Fotografía del planeta Marte" class="w-full h-full object-cover opacity-85" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div class="absolute bottom-3 left-5 right-5 flex items-center justify-between">
-              <h3 class="text-lg font-bold">Marte: 37 misiones</h3>
-              <span class="px-2.5 py-1 text-xs font-bold c-red rounded-sm">1962–2026</span>
+              <h3 class="text-lg font-bold text-white">Marte: 37 misiones</h3>
+              <span class="px-2.5 py-1 text-xs font-bold text-white nasa-red rounded-sm">1962–2026</span>
             </div>
           </div>
           <p class="text-sm text-neutral-300">
-            Marte está mucho más lejos y llegar es más difícil, pero la mayoría de las misiones registradas logró operar:
+            Marte queda mucho más lejos y llegar es más difícil, y aun así la mayoría de las misiones funcionó:
           </p>
           <div class="space-y-3">
             <div>
@@ -183,32 +188,38 @@
                 <span class="text-emerald-400">28 exitosas o activas (76%)</span>
                 <span class="text-neutral-400">Cumplieron su objetivo</span>
               </div>
-              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden"><div class="h-full bg-emerald-500" style="width: 76%"></div></div>
+              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden">
+                <div class="h-full bg-emerald-600" style="width: 76%"></div>
+              </div>
             </div>
             <div>
               <div class="flex justify-between text-xs font-bold mb-1">
                 <span class="text-red-400">9 fallidas (24%)</span>
                 <span class="text-neutral-400">No llegaron o no aterrizaron</span>
               </div>
-              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden"><div class="h-full c-red" style="width: 24%"></div></div>
+              <div class="w-full h-3 bg-white/10 rounded-sm overflow-hidden">
+                <div class="h-full nasa-red" style="width: 24%"></div>
+              </div>
             </div>
           </div>
-          <div class="relative h-44 pt-2"><canvas id="marteDonutChart"></canvas></div>
-          <div class="p-3.5 panel-soft text-xs text-neutral-300">
-            <strong class="text-white">Siguen activas:</strong> 3 misiones en la Luna y 8 en Marte (noviembre de 2026).
+          <div class="relative h-44 pt-2">
+            <canvas id="marteDonutChart"></canvas>
+          </div>
+          <div class="p-3.5 panel border border-white/10 text-xs text-neutral-300">
+            <strong>Siguen activas</strong> (noviembre de 2026): 3 misiones en la Luna y 8 en Marte.
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 2. CUÁNTO DURAN -->
-  <section id="duracion" class="py-16">
+  <!-- SECCIÓN 2: CUÁNTO DURAN (KAPLAN-MEIER: MEDIA, MEDIANA Y CURVA) -->
+  <section id="duracion" class="py-16 bg-black/40 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/15 pb-4">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">Supervivencia de las naves</p>
-          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">¿Cuánto tiempo logran funcionar?</h2>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">¿Cuánto tiempo logran funcionar?</h2>
         </div>
         <div class="flex items-center gap-3">
           <img src="aterrizador.jpg" alt="Módulo lunar del Apolo sobre la Luna" class="h-12 w-20 object-cover border border-white/20" />
@@ -216,22 +227,23 @@
         </div>
       </div>
 
+      <!-- Tarjetas descriptivas: Tiempo Mediano y Tiempo Promedio -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="panel border-t-4 border-t-blue-500 p-6 space-y-4">
+        <div class="panel border border-white/10 border-t-4 border-t-blue-500 p-6 space-y-4">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold">En la Luna</h3>
-            <span class="text-xs font-bold text-blue-300">Misiones operativas</span>
+            <h3 class="text-lg font-bold text-white">En la Luna</h3>
+            <span class="text-xs font-bold text-blue-400">Misiones operativas</span>
           </div>
           <div class="grid grid-cols-2 gap-4">
-            <div class="panel-soft p-4">
+            <div class="panel-soft border border-white/10 p-4">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Mediana</p>
-              <p class="text-2xl sm:text-3xl font-extrabold mt-1">34 días</p>
+              <p class="text-2xl sm:text-3xl font-extrabold text-white mt-1">34 días</p>
               <p class="text-[11px] text-neutral-400 mt-1">La mitad de las naves funcionó hasta 34 días después de llegar.</p>
             </div>
-            <div class="panel-soft p-4">
+            <div class="panel-soft border border-white/10 p-4">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Media</p>
-              <p class="text-2xl sm:text-3xl font-extrabold mt-1">264 días</p>
-              <p class="text-[11px] text-neutral-400 mt-1">Tiempo promedio de operación tras la llegada.</p>
+              <p class="text-2xl sm:text-3xl font-extrabold text-white mt-1">264 días</p>
+              <p class="text-[11px] text-neutral-400 mt-1">Promedio de operación tras la llegada.</p>
             </div>
           </div>
           <p class="text-xs text-neutral-300">
@@ -239,21 +251,21 @@
           </p>
         </div>
 
-        <div class="panel border-t-4 border-t-red-600 p-6 space-y-4">
+        <div class="panel border border-white/10 border-t-4 border-t-red-600 p-6 space-y-4">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-bold">En Marte</h3>
-            <span class="text-xs font-bold text-red-300">37 misiones</span>
+            <h3 class="text-lg font-bold text-white">En Marte</h3>
+            <span class="text-xs font-bold text-red-400">37 misiones</span>
           </div>
           <div class="grid grid-cols-2 gap-4">
-            <div class="panel-soft p-4">
+            <div class="panel-soft border border-white/10 p-4">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Mediana</p>
-              <p class="text-2xl sm:text-3xl font-extrabold mt-1">85 días</p>
+              <p class="text-2xl sm:text-3xl font-extrabold text-white mt-1">85 días</p>
               <p class="text-[11px] text-neutral-400 mt-1">La mitad de las misiones funcionó hasta 85 días después de llegar.</p>
             </div>
-            <div class="panel-soft p-4">
+            <div class="panel-soft border border-white/10 p-4">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Media</p>
-              <p class="text-2xl sm:text-3xl font-extrabold mt-1">1,929 días</p>
-              <p class="text-[11px] text-neutral-400 mt-1">Algo más de 5 años en promedio.</p>
+              <p class="text-2xl sm:text-3xl font-extrabold text-white mt-1">1,929 días</p>
+              <p class="text-[11px] text-neutral-400 mt-1">Unos 5.3 años en promedio.</p>
             </div>
           </div>
           <p class="text-xs text-neutral-300">
@@ -262,119 +274,134 @@
         </div>
       </div>
 
-      <div class="panel border-l-4 border-l-amber-400 p-4 text-xs sm:text-sm text-neutral-200">
-        <strong>¿Por qué en Marte la media (1,929 días) es tan alta frente a la mediana (85 días)?</strong> Varias misiones fallan al inicio, pero las que sobreviven trabajan muchos años (algunas más de 25) y eso sube el promedio.
+      <!-- Explicación sencilla de por qué Media > Mediana -->
+      <div class="panel-soft border-l-4 border-amber-400 p-4 text-xs sm:text-sm text-neutral-200">
+        <strong>¿Por qué en Marte la media (1,929 días) es tan alta frente a la mediana (85 días)?</strong> Muchas misiones fallan pronto, pero las que sobreviven trabajan durante años (algunas más de 25) y arrastran el promedio hacia arriba.
       </div>
 
+      <!-- 2 Gráficos: Curva de Supervivencia (escalonada) + Misiones por Década -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="panel p-5 sm:p-6 space-y-3">
+        <div class="panel border border-white/10 p-5 sm:p-6 space-y-3">
           <div>
-            <h3 class="text-base font-bold">¿Cuántas naves siguen funcionando con el paso del tiempo?</h3>
+            <h3 class="text-base font-bold text-white">¿Cuántas naves siguen funcionando con el tiempo?</h3>
             <p class="text-xs text-neutral-400">Curva de Kaplan-Meier: porcentaje de misiones activas desde la llegada hasta más de 8 años.</p>
           </div>
-          <div class="relative h-72"><canvas id="kmChart"></canvas></div>
-        </div>
-        <div class="panel p-5 sm:p-6 space-y-3">
-          <div>
-            <h3 class="text-base font-bold">Misiones enviadas por década (1950s–2020s)</h3>
-            <p class="text-xs text-neutral-400">Se ve la carrera espacial de los 60–70, la pausa lunar de los 80 y el regreso reciente.</p>
+          <div class="relative h-72">
+            <canvas id="kmChart"></canvas>
           </div>
-          <div class="relative h-72"><canvas id="decadesChart"></canvas></div>
+        </div>
+
+        <div class="panel border border-white/10 p-5 sm:p-6 space-y-3">
+          <div>
+            <h3 class="text-base font-bold text-white">Misiones enviadas por década (1950s–2020s)</h3>
+            <p class="text-xs text-neutral-400">Se ve la carrera espacial de los 60 y 70, la pausa lunar de los 80 y el regreso reciente.</p>
+          </div>
+          <div class="relative h-72">
+            <canvas id="decadesChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 3. QUÉ INFLUYE -->
-  <section id="factores" class="py-16">
+  <!-- SECCIÓN 3: QUÉ INFLUYE (COX ESTRATIFICADO + EVOLUCIÓN + COSTO) -->
+  <section id="factores" class="py-16 border-y border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
-      <div class="border-b border-white/15 pb-4">
+      <div class="border-b border-white/25 pb-4">
         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">Resultados de los modelos</p>
-        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">¿Qué hace que una misión dure más o cueste más?</h2>
+        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">¿Qué hace que una misión dure más o cueste más?</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="panel p-5 space-y-2">
+        <div class="panel border border-white/10 p-5 space-y-2">
           <span class="inline-block px-2 py-0.5 text-[11px] font-bold bg-blue-500/20 text-blue-200 rounded-sm">Mismo destino y época</span>
-          <h3 class="text-base font-bold">El peso</h3>
-          <p class="text-3xl font-extrabold">+19%</p>
+          <h3 class="text-base font-bold text-white">El peso</h3>
+          <p class="text-3xl font-extrabold text-white">+19%</p>
           <p class="text-xs text-neutral-300 leading-relaxed">
-            Comparando naves del <strong>mismo destino y la misma época</strong>, las más pesadas tuvieron 19% más riesgo de terminar antes. Muchas eran naves grandes pensadas para misiones cortas.
+            Entre naves del <strong>mismo destino y la misma época</strong>, las más pesadas tuvieron 19% más riesgo de terminar antes. Muchas eran naves grandes pensadas para misiones cortas.
           </p>
         </div>
-        <div class="panel p-5 space-y-2">
+
+        <div class="panel border border-white/10 p-5 space-y-2">
           <span class="inline-block px-2 py-0.5 text-[11px] font-bold bg-emerald-500/20 text-emerald-200 rounded-sm">Aterrizar vs. orbitar</span>
-          <h3 class="text-base font-bold">Posarse en el suelo</h3>
-          <p class="text-3xl font-extrabold">−10%</p>
+          <h3 class="text-base font-bold text-white">Posarse en el suelo</h3>
+          <p class="text-3xl font-extrabold text-white">−10%</p>
           <p class="text-xs text-neutral-300 leading-relaxed">
-            En la misma comparación, las naves que aterrizaron tuvieron 10% menos riesgo de terminar pronto que las que solo orbitaron.
+            En esa misma comparación, las naves que aterrizaron tuvieron 10% menos riesgo de terminar pronto que las que solo orbitaron.
           </p>
         </div>
-        <div class="panel p-5 space-y-2">
+
+        <div class="panel border border-white/10 p-5 space-y-2">
           <span class="inline-block px-2 py-0.5 text-[11px] font-bold bg-red-500/20 text-red-200 rounded-sm">Avance tecnológico</span>
-          <h3 class="text-base font-bold">Cada década dura más</h3>
-          <p class="text-3xl font-extrabold">1.89x</p>
+          <h3 class="text-base font-bold text-white">Cada década dura más</h3>
+          <p class="text-3xl font-extrabold text-white">1.89x</p>
           <p class="text-xs text-neutral-300 leading-relaxed">
             Por cada 10 años, el tiempo de operación tras la llegada se multiplica por 1.89, casi el <strong>doble</strong>.
           </p>
         </div>
-        <div class="panel p-5 space-y-2">
+
+        <div class="panel border border-white/10 p-5 space-y-2">
           <span class="inline-block px-2 py-0.5 text-[11px] font-bold bg-amber-500/20 text-amber-200 rounded-sm">Costo (43 naves)</span>
-          <h3 class="text-base font-bold">Ir a Marte cuesta más</h3>
-          <p class="text-3xl font-extrabold">2.20x</p>
+          <h3 class="text-base font-bold text-white">Ir a Marte cuesta más</h3>
+          <p class="text-3xl font-extrabold text-white">2.20x</p>
           <p class="text-xs text-neutral-300 leading-relaxed">
             Con el mismo peso y tipo de nave, una misión a Marte cuesta 2.2 veces lo que una a la Luna. Duplicar el peso sube el costo en <strong>24%</strong>.
           </p>
         </div>
       </div>
 
-      <div class="panel p-5 sm:p-6 space-y-3">
+      <!-- Gráfico de Burbujas: Peso vs Días vs Costo -->
+      <div class="panel border border-white/10 p-5 sm:p-6 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 class="text-base font-bold">Peso vs. días funcionando vs. costo (45 naves)</h3>
-            <p class="text-xs text-neutral-400">Pasa el cursor sobre una burbuja para ver la nave. El tamaño del círculo indica el presupuesto.</p>
+            <h3 class="text-base font-bold text-white">Peso, días funcionando y costo (45 naves)</h3>
+            <p class="text-xs text-neutral-300">Toca o pasa el cursor sobre una burbuja para ver la nave. El tamaño del círculo es el presupuesto.</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-bold">
-            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full c-blue inline-block"></span> Luna</span>
-            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full c-red inline-block"></span> Marte</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full nasa-blue inline-block"></span> Luna</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full nasa-red inline-block"></span> Marte</span>
           </div>
         </div>
-        <div class="relative h-80"><canvas id="bubbleCostChart"></canvas></div>
+        <div class="relative h-80">
+          <canvas id="bubbleCostChart"></canvas>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. ROVERS -->
+  <!-- SECCIÓN 4: RÉCORDS DE ROVERS -->
   <section id="rovers" class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-6">
-      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-white/15 pb-4">
+      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">Robots con ruedas</p>
-          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">¿Qué rover recorrió más kilómetros?</h2>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">¿Qué rover recorrió más kilómetros?</h2>
         </div>
         <div class="flex flex-wrap gap-2">
-          <button type="button" data-rover-tab="todos" class="rover-tab-btn px-4 py-1.5 rounded-sm text-xs font-bold c-red text-white transition">Todos (11)</button>
-          <button type="button" data-rover-tab="largos" class="rover-tab-btn px-4 py-1.5 rounded-sm text-xs font-bold btn-off transition">Más de 5 km</button>
-          <button type="button" data-rover-tab="cortos" class="rover-tab-btn px-4 py-1.5 rounded-sm text-xs font-bold btn-off transition">Menos de 5 km</button>
+          <button type="button" data-rover-tab="todos" class="rover-tab-btn px-4 py-1.5 rounded-sm text-xs font-bold nasa-red text-white transition">Todos (11)</button>
+          <button type="button" data-rover-tab="largos" class="rover-tab-btn px-4 py-1.5 rounded-sm text-xs font-bold border border-white/25 text-neutral-200 hover:border-white transition">Más de 5 km</button>
+          <button type="button" data-rover-tab="cortos" class="rover-tab-btn px-4 py-1.5 rounded-sm text-xs font-bold border border-white/25 text-neutral-200 hover:border-white transition">Menos de 5 km</button>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-        <div class="lg:col-span-8 panel p-5 sm:p-6 flex flex-col justify-between">
-          <div class="relative h-80"><canvas id="roversChart"></canvas></div>
+        <div class="lg:col-span-8 panel border border-white/10 p-5 sm:p-6 flex flex-col justify-between">
+          <div class="relative h-80">
+            <canvas id="roversChart"></canvas>
+          </div>
           <p class="text-xs text-neutral-400 mt-4">
-            <strong class="text-blue-300">Azul:</strong> Luna (Lunokhod 2 recorrió 39 km en 1973). <strong class="text-red-300">Rojo:</strong> Marte (Perseverance lidera con 45.22 km, seguido de cerca por Opportunity con 45.16 km).
+            <strong>Azul:</strong> Luna (Lunokhod 2 recorrió 39 km en 1973). <strong>Rojo:</strong> Marte (Perseverance lidera con 45.22 km, seguido de cerca por Opportunity con 45.16 km).
           </p>
         </div>
-        <div class="lg:col-span-4 panel overflow-hidden flex flex-col">
-          <div class="relative h-56 bg-black">
+        <div class="lg:col-span-4 panel text-white border border-white/10 overflow-hidden flex flex-col">
+          <div class="relative h-52 bg-black">
             <img src="rover.jpg" alt="Ilustración del rover Perseverance en Marte" class="w-full h-full object-cover" />
           </div>
           <div class="p-5 space-y-2 flex-1 flex flex-col justify-center">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-red-300">Récord de distancia</span>
-            <h3 class="text-lg font-bold">Perseverance (45.22 km)</h3>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-red-400">Récord de distancia</span>
+            <h3 class="text-lg font-bold text-white">Perseverance (45.22 km)</h3>
             <p class="text-xs text-neutral-300 leading-relaxed">
-              Rover de 1,025 kg que explora el cráter Jezero desde 2021. Superó el récord de Opportunity (45.16 km).
+              Rover de 1,025 kg que explora el cráter Jezero desde 2021. Superó la marca de Opportunity (45.16 km).
             </p>
           </div>
         </div>
@@ -382,99 +409,99 @@
     </div>
   </section>
 
-  <!-- 5. TRES PERFILES -->
-  <section id="grupos" class="py-16">
+  <!-- SECCIÓN 5: 3 TIPOS DE MISIONES -->
+  <section id="grupos" class="py-16 bg-black/40 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
-      <div class="border-b border-white/15 pb-4">
+      <div class="border-b border-white/10 pb-4">
         <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-neutral-400">126 misiones con datos completos</p>
-        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">Los 3 perfiles de misión</h2>
+        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">Los 3 perfiles de misión</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="panel border-t-4 border-t-blue-500 overflow-hidden flex flex-col">
-          <img src="orbitador.jpg" alt="Nave orbitando sobre la Tierra" class="w-full h-40 object-cover opacity-90" />
+        <div class="panel border border-white/10 border-t-4 border-t-blue-500 overflow-hidden flex flex-col">
+          <img src="orbitador.jpg" alt="Transbordador espacial sobre la Tierra" class="w-full h-36 object-cover opacity-85" />
           <div class="p-6 space-y-3">
-            <span class="text-xs font-bold text-blue-300 uppercase">Grupo 1 · 41 misiones</span>
-            <h3 class="text-xl font-bold">Misiones de larga duración</h3>
-            <p class="text-sm text-neutral-300">Naves medianas que tardan meses en llegar y luego trabajan durante años.</p>
-            <ul class="text-xs text-neutral-400 space-y-1 pt-2 border-t border-white/10">
-              <li>Peso típico: <strong class="text-white">386 kg</strong></li>
-              <li>Viaje típico: <strong class="text-white">168 días</strong></li>
-              <li>Tiempo funcionando: <strong class="text-white">656 días</strong></li>
-            </ul>
+          <span class="text-xs font-bold text-blue-400 uppercase">Grupo 1 · 41 misiones</span>
+          <h3 class="text-xl font-bold text-white">Misiones de larga duración</h3>
+          <p class="text-sm text-neutral-300">Naves medianas que tardan meses en llegar y luego trabajan durante años.</p>
+          <ul class="text-xs text-neutral-400 space-y-1 pt-2 border-t border-white/10">
+            <li>Peso típico: <strong class="text-white">386 kg</strong></li>
+            <li>Viaje típico: <strong class="text-white">168 días</strong></li>
+            <li>Tiempo funcionando: <strong class="text-white">656 días</strong></li>
+          </ul>
           </div>
         </div>
 
-        <div class="panel border-t-4 border-t-red-600 overflow-hidden flex flex-col">
-          <img src="marte.jpg" alt="Planeta Marte" class="w-full h-40 object-cover opacity-90" />
+        <div class="panel border border-white/10 border-t-4 border-t-red-600 overflow-hidden flex flex-col">
+          <img src="marte.jpg" alt="Planeta Marte" class="w-full h-36 object-cover opacity-85" />
           <div class="p-6 space-y-3">
-            <span class="text-xs font-bold text-red-300 uppercase">Grupo 2 · 22 misiones</span>
-            <h3 class="text-xl font-bold">Fallas tempranas</h3>
-            <p class="text-sm text-neutral-300">Sondas de peso y viaje parecidos al grupo 1, pero que perdieron contacto o se estrellaron antes de empezar a trabajar.</p>
-            <ul class="text-xs text-neutral-400 space-y-1 pt-2 border-t border-white/10">
-              <li>Peso típico: <strong class="text-white">360 kg</strong></li>
-              <li>Viaje típico: <strong class="text-white">179 días</strong></li>
-              <li>Tiempo funcionando: <strong class="text-white">0 días</strong></li>
-            </ul>
+          <span class="text-xs font-bold text-red-400 uppercase">Grupo 2 · 22 misiones</span>
+          <h3 class="text-xl font-bold text-white">Fallas tempranas</h3>
+          <p class="text-sm text-neutral-300">Sondas de peso y viaje parecidos al grupo 1, pero que perdieron contacto o se estrellaron antes de empezar a trabajar.</p>
+          <ul class="text-xs text-neutral-400 space-y-1 pt-2 border-t border-white/10">
+            <li>Peso típico: <strong class="text-white">360 kg</strong></li>
+            <li>Viaje típico: <strong class="text-white">179 días</strong></li>
+            <li>Tiempo funcionando: <strong class="text-white">0 días</strong></li>
+          </ul>
           </div>
         </div>
 
-        <div class="panel border-t-4 border-t-amber-500 overflow-hidden flex flex-col">
-          <img src="aterrizador.jpg" alt="Módulo lunar del Apolo sobre la Luna" class="w-full h-40 object-cover opacity-90" />
+        <div class="panel border border-white/10 border-t-4 border-t-amber-500 overflow-hidden flex flex-col">
+          <img src="aterrizador.jpg" alt="Módulo lunar del Apolo sobre la Luna" class="w-full h-36 object-cover opacity-85" />
           <div class="p-6 space-y-3">
-            <span class="text-xs font-bold text-amber-300 uppercase">Grupo 3 · 63 misiones</span>
-            <h3 class="text-xl font-bold">Naves lunares pesadas y breves</h3>
-            <p class="text-sm text-neutral-300">Todas fueron a la Luna: naves o etapas muy pesadas que llegan en pocos días para misiones cortas.</p>
-            <ul class="text-xs text-neutral-400 space-y-1 pt-2 border-t border-white/10">
-              <li>Peso típico: <strong class="text-white">1,880 kg</strong></li>
-              <li>Viaje típico: <strong class="text-white">3.6 días</strong></li>
-              <li>Tiempo funcionando: <strong class="text-white">2 días</strong></li>
-            </ul>
+          <span class="text-xs font-bold text-amber-400 uppercase">Grupo 3 · 63 misiones</span>
+          <h3 class="text-xl font-bold text-white">Naves lunares pesadas y breves</h3>
+          <p class="text-sm text-neutral-300">Todas fueron a la Luna: naves o etapas muy pesadas que llegan en pocos días para misiones cortas.</p>
+          <ul class="text-xs text-neutral-400 space-y-1 pt-2 border-t border-white/10">
+            <li>Peso típico: <strong class="text-white">1,880 kg</strong></li>
+            <li>Viaje típico: <strong class="text-white">3.6 días</strong></li>
+            <li>Tiempo funcionando: <strong class="text-white">2 días</strong></li>
+          </ul>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 6. SIMULADOR -->
-  <section id="simulador" class="py-16">
+  <!-- SECCIÓN 6: DISEÑA TU PROPIA NAVE (SIMULADOR INTERACTIVO) -->
+  <section id="simulador" class="py-16 border-t border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
-      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-white/15 pb-4">
+      <div class="flex flex-wrap items-end justify-between gap-4 border-b border-white/25 pb-4">
         <div>
-          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-red-300">Simulador</p>
-          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">Diseña tu propia misión</h2>
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-red-400">Simulador</p>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">Diseña tu propia misión</h2>
           <p class="text-sm text-neutral-300 mt-1">Elige destino, tipo de nave, peso y década. La duración y el costo salen de los mismos modelos del estudio.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-bold uppercase text-neutral-400">Ejemplos reales:</span>
-          <button type="button" data-preset="perseverance" class="preset-btn px-3 py-1 rounded-sm btn-off bg-black/40 text-xs font-bold transition">Perseverance</button>
-          <button type="button" data-preset="chandrayaan" class="preset-btn px-3 py-1 rounded-sm btn-off bg-black/40 text-xs font-bold transition">Chandrayaan-3</button>
-          <button type="button" data-preset="hope" class="preset-btn px-3 py-1 rounded-sm btn-off bg-black/40 text-xs font-bold transition">Hope</button>
+          <span class="text-[11px] font-bold uppercase text-neutral-400">Prueba con:</span>
+          <button type="button" data-preset="perseverance" class="preset-btn px-3 py-1 rounded-sm panel border border-white/25 hover:border-white text-xs font-bold text-neutral-200 transition">Perseverance</button>
+          <button type="button" data-preset="chandrayaan" class="preset-btn px-3 py-1 rounded-sm panel border border-white/25 hover:border-white text-xs font-bold text-neutral-200 transition">Chandrayaan-3</button>
+          <button type="button" data-preset="hope" class="preset-btn px-3 py-1 rounded-sm panel border border-white/25 hover:border-white text-xs font-bold text-neutral-200 transition">Hope</button>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Controles -->
-        <div class="lg:col-span-5 panel p-6 space-y-5">
+        <!-- Panel de diseño -->
+        <div class="lg:col-span-5 panel border border-white/10 p-6 space-y-5">
           <div>
             <label for="sim-name" class="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Nombre de la misión</label>
-            <input id="sim-name" type="text" maxlength="28" value="Mi misión 1" class="w-full px-3.5 py-2 bg-black/50 border border-white/20 rounded-sm text-sm font-bold text-white focus:outline-none focus:border-white" />
+            <input id="sim-name" type="text" maxlength="28" value="Mi misión 1" class="w-full px-3.5 py-2 border border-white/25 rounded-sm text-sm font-bold text-white focus:outline-none focus:border-black bg-black/50" />
           </div>
 
           <div>
             <span class="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">1. Destino</span>
             <div class="grid grid-cols-2 gap-2.5">
-              <button type="button" data-sim-dest="Luna" class="sim-dest-btn px-3.5 py-2.5 rounded-sm text-xs sm:text-sm font-bold c-blue text-white transition">Luna (~3 días de viaje)</button>
-              <button type="button" data-sim-dest="Marte" class="sim-dest-btn px-3.5 py-2.5 rounded-sm text-xs sm:text-sm font-bold btn-off transition">Marte (~180 días)</button>
+              <button type="button" data-sim-dest="Luna" class="sim-dest-btn px-3.5 py-2.5 rounded-sm text-xs sm:text-sm font-bold nasa-blue text-white transition">Luna (~3 días de viaje)</button>
+              <button type="button" data-sim-dest="Marte" class="sim-dest-btn px-3.5 py-2.5 rounded-sm text-xs sm:text-sm font-bold border border-white/25 text-neutral-200 hover:border-white transition">Marte (~180 días)</button>
             </div>
           </div>
 
           <div>
             <span class="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">2. Tipo de nave</span>
             <div class="grid grid-cols-3 gap-2">
-              <button type="button" data-sim-arch="orbiter" class="sim-arch-btn px-2.5 py-2.5 rounded-sm text-xs font-bold btn-off transition">Orbitador</button>
-              <button type="button" data-sim-arch="lander" class="sim-arch-btn px-2.5 py-2.5 rounded-sm text-xs font-bold btn-off transition">Aterrizador</button>
-              <button type="button" data-sim-arch="rover" class="sim-arch-btn px-2.5 py-2.5 rounded-sm text-xs font-bold c-red text-white transition">Rover</button>
+              <button type="button" data-sim-arch="orbiter" class="sim-arch-btn px-2.5 py-2.5 rounded-sm text-xs font-bold border border-white/25 text-neutral-200 hover:border-white transition">Orbitador</button>
+              <button type="button" data-sim-arch="lander" class="sim-arch-btn px-2.5 py-2.5 rounded-sm text-xs font-bold border border-white/25 text-neutral-200 hover:border-white transition">Aterrizador</button>
+              <button type="button" data-sim-arch="rover" class="sim-arch-btn px-2.5 py-2.5 rounded-sm text-xs font-bold nasa-red text-white transition">Rover</button>
             </div>
           </div>
 
@@ -482,39 +509,43 @@
             <div class="flex items-center justify-between mb-1.5 gap-2">
               <label for="sim-mass" class="text-xs font-bold uppercase tracking-wider text-neutral-400">3. Peso de la nave</label>
               <div class="flex items-center gap-1.5">
-                <input id="sim-mass-num" type="number" min="50" max="8500" step="10" value="500" aria-label="Peso exacto en kg" class="w-20 px-2 py-0.5 bg-black/50 border border-white/20 rounded-sm text-xs font-extrabold text-white text-right" />
-                <span class="text-xs font-bold text-neutral-400">kg</span>
+                <input id="sim-mass-num" type="number" min="50" max="8500" step="10" value="500" aria-label="Peso exacto en kg" class="w-20 px-2 py-0.5 border border-white/25 rounded-sm text-xs font-extrabold text-white text-right bg-black/50" />
+                <span id="sim-mass-label" class="text-xs font-bold text-neutral-300">kg</span>
               </div>
             </div>
             <input id="sim-mass" type="range" min="50" max="8500" step="50" value="500" class="w-full accent-red-600 cursor-pointer" />
-            <div class="flex justify-between text-[11px] text-neutral-500 mt-1">
-              <span>50 kg</span><span>4,480 kg (MMX)</span><span>8,500 kg</span>
+            <div class="flex justify-between text-[11px] text-neutral-400 mt-1">
+              <span>50 kg</span>
+              <span>4,480 kg (MMX)</span>
+              <span>8,500 kg</span>
             </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <label for="sim-decade" class="text-xs font-bold uppercase tracking-wider text-neutral-400">4. Década de lanzamiento</label>
-              <span id="sim-decade-label" class="text-sm font-extrabold">Años 2020</span>
+              <span id="sim-decade-label" class="text-sm font-extrabold text-white">Años 2020</span>
             </div>
             <input id="sim-decade" type="range" min="1960" max="2020" step="10" value="2020" class="w-full accent-red-600 cursor-pointer" />
-            <div class="flex justify-between text-[11px] text-neutral-500 mt-1">
-              <span>1960s</span><span>1990s</span><span>2020s</span>
+            <div class="flex justify-between text-[11px] text-neutral-400 mt-1">
+              <span>1960s</span>
+              <span>1990s</span>
+              <span>2020s</span>
             </div>
           </div>
         </div>
 
-        <!-- Vista y resultados -->
-        <div class="lg:col-span-7 panel p-6 space-y-5">
+        <!-- Visor y Resultados -->
+        <div class="lg:col-span-7 panel text-white border border-white/10 p-6 space-y-5">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
             <div>
-              <p class="text-[11px] font-bold uppercase tracking-wider text-red-300">Tu misión</p>
-              <h3 id="sim-title" class="text-xl font-bold mt-0.5">Mi misión 1</h3>
+              <p class="text-[11px] font-bold uppercase tracking-wider text-red-400">Tu misión</p>
+              <h3 id="sim-title" class="text-xl font-bold text-white mt-0.5">Mi misión 1</h3>
               <p id="sim-subtitle" class="text-xs text-neutral-400">Rover · Destino: Luna · Década 2020</p>
             </div>
             <div class="flex items-center gap-2">
-              <span id="sim-profile-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-sm bg-white/10 text-neutral-200">Perfil</span>
-              <span id="sim-badge" class="px-2.5 py-1 text-xs font-bold rounded-sm c-blue text-white">Luna</span>
+              <span id="sim-profile-badge" class="px-2.5 py-1 text-[11px] font-bold rounded-sm bg-neutral-800 text-neutral-200">Perfil</span>
+              <span id="sim-badge" class="px-2.5 py-1 text-xs font-bold rounded-sm nasa-blue text-white">Luna</span>
             </div>
           </div>
 
@@ -527,113 +558,114 @@
                 <img id="sim-dest-img" src="luna.jpg" alt="Luna" class="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover border-2 border-white/40 shadow-lg" />
                 <span id="sim-dest-label" class="text-[10px] font-bold uppercase tracking-wider text-white/90">Destino: Luna</span>
               </div>
-              <div class="absolute bottom-3 left-4 right-4 flex items-end justify-between gap-2 text-white">
-                <div>
-                  <p id="sim-hud-name" class="text-sm font-extrabold">Mi misión 1</p>
-                  <p id="sim-hud-data" class="text-[11px] font-bold text-neutral-300">500 kg · 2020s</p>
-                </div>
+              <div class="absolute bottom-3 left-4 right-4 text-white">
+                <p id="sim-hud-name" class="text-sm font-extrabold">Mi misión 1</p>
+                <p id="sim-hud-data" class="text-[11px] font-bold text-neutral-300">500 kg · 2020s</p>
               </div>
             </div>
             <figcaption id="sim-caption" class="px-3 py-2 text-[11px] text-neutral-400 bg-black/60">Imagen referencial</figcaption>
           </figure>
 
+          <!-- 3 Indicadores calculados -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="panel-soft p-4 space-y-1">
+            <div class="panel border border-white/10 p-4 space-y-1">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Duración esperada</p>
-              <p id="sim-days" class="text-xl sm:text-2xl font-extrabold">—</p>
+              <p id="sim-days" class="text-xl sm:text-2xl font-extrabold text-white">—</p>
               <p class="text-[11px] text-neutral-400">Mediana tras la llegada</p>
             </div>
-            <div class="panel-soft p-4 space-y-1">
+            <div class="panel border border-white/10 p-4 space-y-1">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Costo estimado</p>
-              <p id="sim-cost" class="text-xl sm:text-2xl font-extrabold">—</p>
+              <p id="sim-cost" class="text-xl sm:text-2xl font-extrabold text-white">—</p>
               <p class="text-[11px] text-neutral-400">Millones de dólares</p>
             </div>
-            <div class="panel-soft p-4 space-y-1">
+            <div class="panel border border-white/10 p-4 space-y-1">
               <p class="text-[11px] font-bold uppercase text-neutral-400">Tiempo de viaje</p>
-              <p id="sim-travel" class="text-xl sm:text-2xl font-extrabold">—</p>
+              <p id="sim-travel" class="text-xl sm:text-2xl font-extrabold text-white">—</p>
               <p class="text-[11px] text-neutral-400">Desde el despegue</p>
             </div>
           </div>
 
-          <p id="sim-note" class="text-xs text-neutral-300 bg-black/50 border-l-4 border-red-600 p-3.5"></p>
+          <p id="sim-note" class="text-xs text-neutral-300 panel-soft border-l-4 border-red-600 p-3.5"></p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 7. MISIONES RECIENTES Y PRÓXIMAS -->
-  <section id="futuro" class="py-16">
+  <!-- SECCIÓN 7: MISIONES RECIENTES Y FUTURAS -->
+  <section id="futuro" class="py-16 border-t border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
       <div class="relative overflow-hidden border border-white/10 h-48 sm:h-64">
-        <img src="lanzamiento.jpg" alt="Despegue del cohete SLS del programa Artemis" class="absolute inset-0 w-full h-full object-cover object-center" />
+        <img src="lanzamiento.jpg" alt="Despegue del cohete SLS de la NASA" class="absolute inset-0 w-full h-full object-cover object-center" />
         <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-transparent"></div>
         <div class="relative h-full flex flex-col justify-end p-5 sm:p-8 max-w-2xl">
-          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-red-300">2025–2030</p>
-          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mt-1 sec-title">¿Qué esperamos de las misiones recientes y próximas?</h2>
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-red-400">2025–2030</p>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white mt-1">¿Qué predicen nuestros datos para las misiones recientes y futuras?</h2>
         </div>
       </div>
 
       <div class="flex flex-wrap items-end justify-between gap-4">
         <p class="text-sm text-neutral-300 max-w-3xl">
-          Aplicamos los modelos del estudio a 8 misiones lanzadas o programadas entre 2025 y 2030. En las que ya llegaron a su destino, comparamos la predicción con lo que realmente ocurrió.
+          Pasamos 8 misiones de 2025 a 2030 por los mismos modelos del simulador. Donde ya hay un resultado, lo ponemos al lado de la predicción.
         </p>
         <div class="flex flex-wrap gap-2">
-          <button type="button" data-fut-filter="all" class="fut-filter-btn px-3.5 py-1.5 rounded-sm text-xs font-bold c-red text-white transition">Todas (8)</button>
-          <button type="button" data-fut-filter="Luna" class="fut-filter-btn px-3.5 py-1.5 rounded-sm text-xs font-bold btn-off transition">Luna (5)</button>
-          <button type="button" data-fut-filter="Marte" class="fut-filter-btn px-3.5 py-1.5 rounded-sm text-xs font-bold btn-off transition">Marte (3)</button>
+          <button type="button" data-fut-filter="all" class="fut-filter-btn px-3.5 py-1.5 rounded-sm text-xs font-bold nasa-red text-white transition">Todas (8)</button>
+          <button type="button" data-fut-filter="Luna" class="fut-filter-btn px-3.5 py-1.5 rounded-sm text-xs font-bold border border-white/25 text-neutral-200 hover:border-white transition">Luna (5)</button>
+          <button type="button" data-fut-filter="Marte" class="fut-filter-btn px-3.5 py-1.5 rounded-sm text-xs font-bold border border-white/25 text-neutral-200 hover:border-white transition">Marte (3)</button>
         </div>
       </div>
 
       <div id="future-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"></div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div class="panel border-l-4 border-l-amber-400 p-4 text-xs sm:text-sm text-neutral-200">
-          <strong>Lo que pasó en 2025:</strong> de las 3 misiones lunares lanzadas ese año, solo Blue Ghost 1 funcionó. Resilience se estrelló al aterrizar y Lunar Trailblazer perdió contacto al día siguiente del lanzamiento. Las dos encajan en el grupo de “fallas tempranas”: el modelo de duración estima cuánto dura una nave <em>si llega bien</em>, pero no predice estas fallas.
+        <div class="panel-soft border-l-4 border-l-amber-400 p-4 text-xs sm:text-sm text-neutral-200">
+          <strong>2025 en la Luna:</strong> de cuatro misiones, solo Blue Ghost 1 cumplió. Resilience se estrelló al aterrizar, Lunar Trailblazer perdió contacto al día siguiente del lanzamiento e IM-2 quedó volcada tras aterrizar y duró menos de un día. Son justo las “fallas tempranas”: el modelo calcula cuánto dura una nave <em>si llega bien</em>, no si llega.
         </div>
         <div class="panel p-4 text-xs sm:text-sm text-neutral-300">
-          <strong class="text-white">Sobre los costos:</strong> las estimaciones se basan en misiones de 1959 a 2026. Las misiones comerciales y de bajo costo recientes, como ESCAPADE, cuestan bastante menos de lo que predice el modelo. Las fotos de las tarjetas son referenciales según el tipo de nave.
+          <strong class="text-white">Sobre los costos:</strong> salen de misiones de 1959 a 2026. Las misiones comerciales y de bajo costo, como ESCAPADE, pueden costar bastante menos de lo que calcula el modelo. Las fotos de las tarjetas muestran el tipo de nave, no la misión.
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 8. MÉTODOS -->
-  <section id="tecnicas" class="py-12">
+  <!-- SECCIÓN 8: TÉCNICAS ESTADÍSTICAS EMPLEADAS (BREVE) -->
+  <section id="tecnicas" class="py-12 bg-black/40 text-white border-t border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 space-y-6">
-      <div class="border-b border-white/15 pb-3">
-        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-red-300">Métodos</p>
-        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight mt-1">Técnicas estadísticas usadas</h2>
+      <div class="border-b border-white/10 pb-3">
+        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-red-400">Métodos</p>
+        <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white mt-1">Técnicas estadísticas usadas</h2>
       </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div class="panel p-4 space-y-1.5">
-          <h3 class="text-xs font-bold text-blue-300 uppercase">Kaplan-Meier</h3>
-          <p class="text-xs text-neutral-300 leading-relaxed">Mediana, media y porcentaje de naves activas en el tiempo, considerando las que todavía operan (censura).</p>
+        <div class="panel-soft border border-white/10 p-4 space-y-1.5">
+          <h3 class="text-xs font-bold text-blue-400 uppercase">Kaplan-Meier</h3>
+          <p class="text-xs text-neutral-300 leading-relaxed">Calcula la mediana, el promedio y cuántos siguen activos día a día, tomando en cuenta las naves que aún operan.</p>
         </div>
-        <div class="panel p-4 space-y-1.5">
-          <h3 class="text-xs font-bold text-blue-300 uppercase">Cox estratificado</h3>
-          <p class="text-xs text-neutral-300 leading-relaxed">Efecto del peso y del aterrizaje dentro de cada destino y época.</p>
+        <div class="panel-soft border border-white/10 p-4 space-y-1.5">
+          <h3 class="text-xs font-bold text-blue-400 uppercase">Cox Estratificado</h3>
+          <p class="text-xs text-neutral-300 leading-relaxed">Compara de forma justa el efecto del peso y el aterrizaje dentro del mismo destino y la misma época.</p>
         </div>
-        <div class="panel p-4 space-y-1.5">
-          <h3 class="text-xs font-bold text-red-300 uppercase">AFT Weibull</h3>
-          <p class="text-xs text-neutral-300 leading-relaxed">Efecto de la década sobre la duración; se usa para la duración esperada del simulador.</p>
+        <div class="panel-soft border border-white/10 p-4 space-y-1.5">
+          <h3 class="text-xs font-bold text-red-400 uppercase">AFT Weibull</h3>
+          <p class="text-xs text-neutral-300 leading-relaxed">Mide cómo cada década alarga la vida de las naves y predice la duración esperada en el simulador.</p>
         </div>
-        <div class="panel p-4 space-y-1.5">
-          <h3 class="text-xs font-bold text-amber-300 uppercase">GLM Gamma</h3>
-          <p class="text-xs text-neutral-300 leading-relaxed">Costo según destino, peso y tipo de nave, con enlace logarítmico.</p>
+        <div class="panel-soft border border-white/10 p-4 space-y-1.5">
+          <h3 class="text-xs font-bold text-amber-400 uppercase">GLM Gamma</h3>
+          <p class="text-xs text-neutral-300 leading-relaxed">Estima el presupuesto de las misiones según su destino, peso y tipo de operación (enlace logarítmico).</p>
         </div>
-        <div class="panel p-4 space-y-1.5">
-          <h3 class="text-xs font-bold text-emerald-300 uppercase">PCA y K-Means</h3>
-          <p class="text-xs text-neutral-300 leading-relaxed">Agrupa las 126 misiones completas en 3 perfiles según peso, viaje y vida útil.</p>
+        <div class="panel-soft border border-white/10 p-4 space-y-1.5">
+          <h3 class="text-xs font-bold text-emerald-400 uppercase">PCA y K-Means</h3>
+          <p class="text-xs text-neutral-300 leading-relaxed">Agrupa automáticamente las 126 misiones completas en 3 perfiles según peso, viaje y vida útil.</p>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer class="bg-black/85 text-neutral-400 py-10 border-t border-white/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-      <div class="space-y-1 text-xs">
-        <p class="text-neutral-300">Datos: catálogos públicos del NSSDC (NASA), actualizados a noviembre de 2026.</p>
-        <p>Imágenes: NASA. Fondo: ilustración de una base en Marte (NASA, 1989).</p>
+      <div class="flex items-center gap-3">
+        <img src="https://nssdc.gsfc.nasa.gov/logo/nasa_logo.gif" alt="Logo de la NASA" class="h-8 w-auto" />
+        <span class="text-xs text-neutral-300">Datos: catálogos públicos del NSSDC (NASA), actualizados a noviembre de 2026. Imágenes: NASA. Fondo: el mismo campo de estrellas de COSMIC TRACE.</span>
       </div>
       <div class="flex flex-wrap gap-4 text-xs">
         <a href="https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html" target="_blank" rel="noopener noreferrer" class="text-white hover:underline font-semibold">Objetos en la Luna (NSSDC)</a>
@@ -643,53 +675,48 @@
   </footer>
 
   <script>
-    // ---------- Imágenes locales ----------
-    const IMG = {
-      orbiter: 'orbitador.jpg',
-      lander: 'aterrizador.jpg',
-      rover: 'rover.jpg',
-      Luna: 'luna.jpg',
-      Marte: 'marte.jpg'
-    };
+    // ---------- Fotos (misma carpeta que index.html) ----------
+    const IMG = { orbiter: 'orbitador.jpg', lander: 'aterrizador.jpg', rover: 'rover.jpg', Luna: 'luna.jpg', Marte: 'marte.jpg' };
+    const ARCH_LABEL = { rover: 'Rover', lander: 'Aterrizador', orbiter: 'Orbitador' };
     const IMG_CAPTION = {
-      orbiter: 'Imagen referencial: nave en órbita sobre la Tierra (NASA).',
+      orbiter: 'Imagen referencial: transbordador espacial en órbita (NASA).',
       lander: 'Imagen referencial: módulo lunar del programa Apolo (NASA).',
-      rover: 'Imagen referencial: ilustración del rover Perseverance en Marte (NASA/JPL).'
+      rover: 'Imagen referencial: ilustración del rover Perseverance (NASA/JPL).'
     };
 
-    // ---------- Datos ----------
     const BUBBLES_DATA = [{"name": "Apollo 11 LM descent stage", "dest": "Luna", "x": 2034.0, "y": 0.9, "y_real": 0.9, "costo": 355.0}, {"name": "Apollo 14 LM descent stage", "dest": "Luna", "x": 2144.0, "y": 1.4, "y_real": 1.4, "costo": 400.0}, {"name": "Apollo 15 LM descent stage", "dest": "Luna", "x": 2809.0, "y": 2.8, "y_real": 2.8, "costo": 445.0}, {"name": "GRAIL A", "dest": "Luna", "x": 132.6, "y": 352.0, "y_real": 352.0, "costo": 496.0}, {"name": "LADEE", "dest": "Luna", "x": 248.2, "y": 194.0, "y_real": 194.0, "costo": 280.0}, {"name": "Chang'e 4", "dest": "Luna", "x": 1200.0, "y": 2873.0, "y_real": 2873.0, "costo": 72.6}, {"name": "Beresheet", "dest": "Luna", "x": 150.0, "y": 0.5, "y_real": 0.0, "costo": 95.0}, {"name": "Vikram", "dest": "Luna", "x": 626.0, "y": 0.5, "y_real": 0.0, "costo": 141.0}, {"name": "Hakuto-R Mission 1", "dest": "Luna", "x": 340.0, "y": 0.5, "y_real": 0.0, "costo": 90.0}, {"name": "Luna 25", "dest": "Luna", "x": 1750.0, "y": 0.5, "y_real": 0.0, "costo": 130.0}, {"name": "Chandrayaan 3", "dest": "Luna", "x": 1752.0, "y": 12.0, "y_real": 12.0, "costo": 75.0}, {"name": "SLIM", "dest": "Luna", "x": 120.0, "y": 129.0, "y_real": 129.0, "costo": 120.0}, {"name": "Odysseus (IM-1)", "dest": "Luna", "x": 675.0, "y": 7.0, "y_real": 7.0, "costo": 118.0}, {"name": "Blue Ghost 1", "dest": "Luna", "x": 469.0, "y": 14.0, "y_real": 14.0, "costo": 103.3}, {"name": "Intuitive Machines 2", "dest": "Luna", "x": 2120.0, "y": 0.5, "y_real": 0.5, "costo": 47.0}, {"name": "Lunar Prospector", "dest": "Luna", "x": 158.0, "y": 565.0, "y_real": 565.0, "costo": 62.8}, {"name": "SMART-1", "dest": "Luna", "x": 287.0, "y": 656.5, "y_real": 656.5, "costo": 170.0}, {"name": "Chandraya'an 1 MIP", "dest": "Luna", "x": 35.0, "y": 0.5, "y_real": 0.0, "costo": 88.7}, {"name": "Chang'e 1", "dest": "Luna", "x": 2000.0, "y": 482.0, "y_real": 482.0, "costo": 177.5}, {"name": "Kaguya", "dest": "Luna", "x": 1984.0, "y": 616.0, "y_real": 616.0, "costo": 474.0}, {"name": "LCROSS spacecraft", "dest": "Luna", "x": 534.0, "y": 0.5, "y_real": 0.0, "costo": 79.0}, {"name": "Apollo 10 LM descent stage", "dest": "Luna", "x": 2133.0, "y": 1.1, "y_real": 1.1, "costo": 350.0}, {"name": "Mars 2020 (Perseverance)", "dest": "Marte", "x": 1025.0, "y": 2096.0, "y_real": 2096.0, "costo": 2725.0}, {"name": "Hope", "dest": "Marte", "x": 550.0, "y": 2105.0, "y_real": 2105.0, "costo": 200.0}, {"name": "InSight", "dest": "Marte", "x": 358.0, "y": 1480.0, "y_real": 1480.0, "costo": 813.6}, {"name": "MAVEN", "dest": "Marte", "x": 809.0, "y": 4093.0, "y_real": 4093.0, "costo": 582.5}, {"name": "Mangalyaan", "dest": "Marte", "x": 482.5, "y": 2925.0, "y_real": 2925.0, "costo": 73.0}, {"name": "NASA Mars Science Laboratory (Curiosity)", "dest": "Marte", "x": 899.0, "y": 5214.0, "y_real": 5214.0, "costo": 2500.0}, {"name": "Phobos-Grunt", "dest": "Marte", "x": 2300.0, "y": 0.5, "y_real": 0.0, "costo": 163.0}, {"name": "Phoenix", "dest": "Marte", "x": 350.0, "y": 161.0, "y_real": 161.0, "costo": 420.0}, {"name": "Mars Reconnaissance Orbiter", "dest": "Marte", "x": 1031.0, "y": 7555.0, "y_real": 7555.0, "costo": 716.6}, {"name": "Mars Exploration Rovers (Spirit/Opportunity)", "dest": "Marte", "x": 185.0, "y": 5250.0, "y_real": 5250.0, "costo": 1080.0}, {"name": "Mars Express", "dest": "Marte", "x": 666.0, "y": 8361.0, "y_real": 8361.0, "costo": 195.0}, {"name": "2001 Mars Odyssey", "dest": "Marte", "x": 376.3, "y": 9153.0, "y_real": 9153.0, "costo": 297.0}, {"name": "Mars Polar Lander", "dest": "Marte", "x": 290.0, "y": 0.5, "y_real": 0.0, "costo": 165.0}, {"name": "Deep Space 2", "dest": "Marte", "x": 3.6, "y": 0.5, "y_real": 0.0, "costo": 28.0}, {"name": "Mars Climate Orbiter", "dest": "Marte", "x": 338.0, "y": 0.5, "y_real": 0.0, "costo": 125.0}, {"name": "Nozomi (Planet-B)", "dest": "Marte", "x": 225.0, "y": 0.5, "y_real": 0.0, "costo": 88.0}, {"name": "Mars Global Surveyor", "dest": "Marte", "x": 1030.5, "y": 3338.0, "y_real": 3338.0, "costo": 219.0}, {"name": "Mars Pathfinder", "dest": "Marte", "x": 890.0, "y": 85.0, "y_real": 85.0, "costo": 280.0}, {"name": "Mars Observer", "dest": "Marte", "x": 1018.0, "y": 0.5, "y_real": 0.0, "costo": 813.0}, {"name": "Viking (1 y 2)", "dest": "Marte", "x": 1455.0, "y": 2307.0, "y_real": 2307.0, "costo": 1060.0}, {"name": "Mariner 9", "dest": "Marte", "x": 558.8, "y": 348.0, "y_real": 348.0, "costo": 129.0}, {"name": "Mariner 7", "dest": "Marte", "x": 381.0, "y": 0.5, "y_real": 0.5, "costo": 148.0}, {"name": "Mariner 4", "dest": "Marte", "x": 260.8, "y": 0.5, "y_real": 0.5, "costo": 83.2}];
     const DEC_LABELS = ["1950s", "1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s"];
     const DEC_LUNA = [2, 32, 29, 0, 2, 8, 10, 12];
     const DEC_MARTE = [0, 4, 8, 2, 8, 5, 7, 3];
 
-    const C_LUNA = '#4f7fe0';
-    const C_MARTE = '#e4002b';
-    const GRID = 'rgba(255,255,255,0.10)';
-    const TICK = '#bdbdbd';
-
-    // ---------- Gráficos ----------
     function initCharts() {
       if (typeof Chart === 'undefined') return;
       Chart.defaults.color = '#d4d4d4';
+      Chart.defaults.borderColor = 'rgba(255,255,255,0.10)';
       Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
 
-      const donutOpts = {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '62%',
-        plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 }, color: '#e5e5e5' } } }
-      };
-
+      // 1. Donas de Inventario (Luna y Marte)
       const lunaDonut = document.getElementById('lunaDonutChart');
       if (lunaDonut) {
         new Chart(lunaDonut, {
           type: 'doughnut',
           data: {
             labels: ['Encontrados (LRO)', 'Zona aproximada', 'Sin ubicar'],
-            datasets: [{ data: [49, 29, 18], backgroundColor: ['#10b981', '#9ca3af', C_MARTE], borderWidth: 2, borderColor: '#111' }]
+            datasets: [{
+              data: [49, 29, 18],
+              backgroundColor: ['#059669', '#737373', '#e4002b'],
+              borderWidth: 2,
+              borderColor: '#111'
+            }]
           },
-          options: donutOpts
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+              legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+          }
         });
       }
 
@@ -698,13 +725,26 @@
         new Chart(marteDonut, {
           type: 'doughnut',
           data: {
-            labels: ['Exitosas / activas', 'Fallidas'],
-            datasets: [{ data: [28, 9], backgroundColor: ['#10b981', C_MARTE], borderWidth: 2, borderColor: '#111' }]
+            labels: ['Exitosas / Activas', 'Fallidas'],
+            datasets: [{
+              data: [28, 9],
+              backgroundColor: ['#059669', '#e4002b'],
+              borderWidth: 2,
+              borderColor: '#111'
+            }]
           },
-          options: donutOpts
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+              legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+            }
+          }
         });
       }
 
+      // 2. Curva de Supervivencia Kaplan-Meier (escalonada)
       const kmCtx = document.getElementById('kmChart');
       if (kmCtx) {
         new Chart(kmCtx, {
@@ -712,8 +752,26 @@
           data: {
             labels: ['0 días', '7 días', '30 días', '90 días', '180 días', '1 año', '2 años', '4 años', '8+ años'],
             datasets: [
-              { label: 'Luna (% activas)', data: [100.0, 55.6, 51.4, 36.1, 31.9, 22.2, 8.3, 6.9, 4.2], borderColor: C_LUNA, backgroundColor: 'rgba(79,127,224,0.16)', borderWidth: 2.5, stepped: 'before', fill: true, pointRadius: 4 },
-              { label: 'Marte (% activas)', data: [100.0, 56.8, 54.1, 48.6, 45.9, 37.8, 37.8, 35.1, 28.1], borderColor: C_MARTE, backgroundColor: 'rgba(228,0,43,0.16)', borderWidth: 2.5, stepped: 'before', fill: true, pointRadius: 4 }
+              {
+                label: 'Luna (% activas)',
+                data: [100.0, 55.6, 51.4, 36.1, 31.9, 22.2, 8.3, 6.9, 4.2],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.14)',
+                borderWidth: 2.5,
+                stepped: 'before',
+                fill: true,
+                pointRadius: 4
+              },
+              {
+                label: 'Marte (% activas)',
+                data: [100.0, 56.8, 54.1, 48.6, 45.9, 37.8, 37.8, 35.1, 28.1],
+                borderColor: '#e4002b',
+                backgroundColor: 'rgba(228, 0, 43, 0.14)',
+                borderWidth: 2.5,
+                stepped: 'before',
+                fill: true,
+                pointRadius: 4
+              }
             ]
           },
           options: {
@@ -721,16 +779,30 @@
             maintainAspectRatio: false,
             plugins: {
               legend: { labels: { color: '#ffffff' } },
-              tooltip: { callbacks: { label: ctx => `${ctx.dataset.label.split(' ')[0]}: ${ctx.parsed.y}% seguían activas` } }
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${ctx.dataset.label.split(' ')[0]}: ${ctx.parsed.y}% seguían activas`
+                }
+              }
             },
             scales: {
-              y: { min: 0, max: 100, grid: { color: GRID }, ticks: { color: TICK, callback: v => v + '%' }, title: { display: true, text: 'Naves que siguen funcionando', color: '#e5e5e5' } },
-              x: { grid: { color: GRID }, ticks: { color: TICK } }
+              y: {
+                min: 0,
+                max: 100,
+                grid: { color: 'rgba(255,255,255,0.10)' },
+                ticks: { color: '#bdbdbd', callback: v => v + '%' },
+                title: { display: true, text: 'Naves que siguen funcionando', color: '#e5e5e5' }
+              },
+              x: {
+                grid: { color: 'rgba(255,255,255,0.10)' },
+                ticks: { color: '#bdbdbd' }
+              }
             }
           }
         });
       }
 
+      // 3. Misiones por Década
       const decCtx = document.getElementById('decadesChart');
       if (decCtx) {
         new Chart(decCtx, {
@@ -738,31 +810,69 @@
           data: {
             labels: DEC_LABELS,
             datasets: [
-              { label: 'Luna', data: DEC_LUNA, backgroundColor: C_LUNA, borderRadius: 2 },
-              { label: 'Marte', data: DEC_MARTE, backgroundColor: C_MARTE, borderRadius: 2 }
+              {
+                label: 'Luna',
+                data: DEC_LUNA,
+                backgroundColor: '#3b82f6',
+                borderRadius: 2
+              },
+              {
+                label: 'Marte',
+                data: DEC_MARTE,
+                backgroundColor: '#e4002b',
+                borderRadius: 2
+              }
             ]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#ffffff' } } },
+            plugins: {
+              legend: { labels: { color: '#ffffff' } }
+            },
             scales: {
-              y: { beginAtZero: true, grid: { color: GRID }, ticks: { color: TICK }, title: { display: true, text: 'Cantidad de misiones', color: '#e5e5e5' } },
-              x: { grid: { color: GRID }, ticks: { color: TICK } }
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.10)' },
+                ticks: { color: '#bdbdbd' },
+                title: { display: true, text: 'Cantidad de misiones', color: '#d4d4d4' }
+              },
+              x: {
+                grid: { color: 'rgba(255,255,255,0.10)' },
+                ticks: { color: '#bdbdbd' }
+              }
             }
           }
         });
       }
 
+      // 4. Burbujas: Peso vs Días vs Costo (45 misiones)
       const bubCtx = document.getElementById('bubbleCostChart');
       if (bubCtx) {
-        const toBub = d => ({ x: d.x, y: d.y, r: Math.max(4, Math.min(24, Math.sqrt(d.costo) * 0.42)), meta: d });
+        const toBub = d => ({
+          x: d.x,
+          y: d.y,
+          r: Math.max(4, Math.min(24, Math.sqrt(d.costo) * 0.42)),
+          meta: d
+        });
         new Chart(bubCtx, {
           type: 'bubble',
           data: {
             datasets: [
-              { label: 'Luna', data: BUBBLES_DATA.filter(d => d.dest === 'Luna').map(toBub), backgroundColor: 'rgba(79,127,224,0.70)', borderColor: C_LUNA, borderWidth: 1.5 },
-              { label: 'Marte', data: BUBBLES_DATA.filter(d => d.dest === 'Marte').map(toBub), backgroundColor: 'rgba(228,0,43,0.70)', borderColor: C_MARTE, borderWidth: 1.5 }
+              {
+                label: 'Luna',
+                data: BUBBLES_DATA.filter(d => d.dest === 'Luna').map(toBub),
+                backgroundColor: 'rgba(79, 127, 224, 0.72)',
+                borderColor: '#4f7fe0',
+                borderWidth: 1.5
+              },
+              {
+                label: 'Marte',
+                data: BUBBLES_DATA.filter(d => d.dest === 'Marte').map(toBub),
+                backgroundColor: 'rgba(228, 0, 43, 0.72)',
+                borderColor: '#e4002b',
+                borderWidth: 1.5
+              }
             ]
           },
           options: {
@@ -770,31 +880,47 @@
             maintainAspectRatio: false,
             plugins: {
               legend: { display: false },
-              tooltip: { callbacks: { label: ctx => { const m = ctx.raw.meta; return `${m.name} (${m.dest}): ${m.x} kg · ${m.y_real} días · $${m.costo} M`; } } }
+              tooltip: {
+                callbacks: {
+                  label: ctx => {
+                    const m = ctx.raw.meta;
+                    return `${m.name} (${m.dest}): ${m.x} kg · ${m.y_real} días · $${m.costo}M USD`;
+                  }
+                }
+              }
             },
             scales: {
-              x: { type: 'logarithmic', grid: { color: GRID }, title: { display: true, text: 'Peso de la nave en kg (escala logarítmica)', color: '#e5e5e5' }, ticks: { color: TICK, callback: v => [1, 10, 100, 1000, 5000].includes(v) ? v + ' kg' : '' } },
-              y: { type: 'logarithmic', grid: { color: GRID }, title: { display: true, text: 'Días funcionando (escala logarítmica)', color: '#e5e5e5' }, ticks: { color: TICK, callback: v => [1, 10, 100, 1000, 10000].includes(v) ? v + ' d' : '' } }
+              x: {
+                type: 'logarithmic',
+                title: { display: true, text: 'Peso de la nave en kg (escala logarítmica)', color: '#e5e5e5' },
+                ticks: { callback: v => [1, 10, 100, 1000, 5000].includes(v) ? v + ' kg' : '' }
+              },
+              y: {
+                type: 'logarithmic',
+                title: { display: true, text: 'Días funcionando (escala logarítmica)', color: '#e5e5e5' },
+                ticks: { callback: v => [1, 10, 100, 1000, 10000].includes(v) ? v + ' d' : '' }
+              }
             }
           }
         });
       }
 
+      // 5. Gráfico de Rovers (Todos / Maratones / Cortos)
       const ROVER_DATA = {
         todos: {
           labels: ['Perseverance (M)', 'Opportunity (M)', 'Lunokhod 2 (L)', 'Curiosity (M)', 'Lunokhod 1 (L)', 'Spirit (M)', 'Zhurong (M)', 'Yutu 2 (L)', 'Yutu (L)', 'Pragyan (L)', 'Sojourner (M)'],
           values: [45.22, 45.16, 39.0, 38.29, 10.54, 7.73, 1.92, 1.61, 0.114, 0.1, 0.1],
-          colors: [C_MARTE, C_MARTE, C_LUNA, C_MARTE, C_LUNA, C_MARTE, C_MARTE, C_LUNA, C_LUNA, C_LUNA, C_MARTE]
+          colors: ['#e4002b', '#e4002b', '#4f7fe0', '#e4002b', '#4f7fe0', '#e4002b', '#e4002b', '#4f7fe0', '#4f7fe0', '#4f7fe0', '#e4002b']
         },
         largos: {
           labels: ['Perseverance (Marte)', 'Opportunity (Marte)', 'Lunokhod 2 (Luna)', 'Curiosity (Marte)', 'Lunokhod 1 (Luna)', 'Spirit (Marte)'],
           values: [45.22, 45.16, 39.0, 38.29, 10.54, 7.73],
-          colors: [C_MARTE, C_MARTE, C_LUNA, C_MARTE, C_LUNA, C_MARTE]
+          colors: ['#e4002b', '#e4002b', '#4f7fe0', '#e4002b', '#4f7fe0', '#e4002b']
         },
         cortos: {
           labels: ['Zhurong (Marte)', 'Yutu 2 (Luna)', 'Yutu (Luna)', 'Pragyan (Luna)', 'Sojourner (Marte)'],
           values: [1.92, 1.61, 0.114, 0.1, 0.1],
-          colors: [C_MARTE, C_LUNA, C_LUNA, C_LUNA, C_MARTE]
+          colors: ['#e4002b', '#4f7fe0', '#4f7fe0', '#4f7fe0', '#e4002b']
         }
       };
 
@@ -806,15 +932,30 @@
         if (roverChart) roverChart.destroy();
         roverChart = new Chart(roverCtx, {
           type: 'bar',
-          data: { labels: d.labels, datasets: [{ label: 'Kilómetros recorridos', data: d.values, backgroundColor: d.colors, borderRadius: 2 }] },
+          data: {
+            labels: d.labels,
+            datasets: [{
+              label: 'Kilómetros recorridos',
+              data: d.values,
+              backgroundColor: d.colors,
+              borderRadius: 2
+            }]
+          },
           options: {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.x} km recorridos` } } },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: ctx => `${ctx.parsed.x} km recorridos` }
+              }
+            },
             scales: {
-              x: { beginAtZero: true, grid: { color: GRID }, ticks: { color: TICK }, title: { display: true, text: 'Distancia (km)', color: '#e5e5e5' } },
-              y: { grid: { color: GRID }, ticks: { color: '#e5e5e5' } }
+              x: {
+                beginAtZero: true,
+                title: { display: true, text: 'Distancia (km)', color: '#e5e5e5' }
+              }
             }
           }
         });
@@ -823,42 +964,24 @@
       document.querySelectorAll('.rover-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const tab = btn.dataset.roverTab;
-          document.querySelectorAll('.rover-tab-btn').forEach(b => setActive(b, b.dataset.roverTab === tab, 'c-red'));
+          document.querySelectorAll('.rover-tab-btn').forEach(b => {
+            const active = b.dataset.roverTab === tab;
+            b.classList.toggle('nasa-red', active);
+            b.classList.toggle('text-white', active);
+            b.classList.toggle('border', !active);
+            b.classList.toggle('border-white/25', !active);
+            b.classList.toggle('text-neutral-200', !active);
+          });
           renderRovers(tab);
         });
       });
-      renderRovers('todos');
-    }
 
-    // Botón activo / inactivo
-    function setActive(btn, active, colorClass) {
-      btn.classList.remove('c-red', 'c-blue');
-      btn.classList.toggle(colorClass, active);
-      btn.classList.toggle('text-white', active);
-      btn.classList.toggle('btn-off', !active);
+      renderRovers('todos');
     }
 
     initCharts();
 
-    // ---------- Modelos ----------
-    function calcPrediction(dest, arch, mass, decade) {
-      const isMars = dest === 'Marte' ? 1 : 0;
-      const isLander = arch === 'orbiter' ? 0 : 1;
-      const decC = (decade - 1990) / 10;
-      // AFT Weibull (duración mediana)
-      const eta = 6.1725 + 1.6034 * isMars + 0.6360 * decC - 0.5164 * Math.log(mass) + 0.4735 * isLander;
-      const medianDays = Math.max(1, Math.round(Math.exp(eta) * Math.pow(Math.log(2), 3.54)));
-      // GLM Gamma (costo en millones USD)
-      const costEst = Math.round(210 * (isMars ? 2.20 : 1.0) * (isLander ? 1.78 : 1.0) * Math.pow(mass / 400, 0.313) * Math.pow(1.061, decC));
-      return { medianDays, costEst };
-    }
-
-    function formatDays(d) {
-      if (d >= 365) return `${d.toLocaleString('es-PE')} días (~${(d / 365).toFixed(1)} años)`;
-      return `${d} días`;
-    }
-
-    // ---------- Simulador ----------
+    // 6. SIMULADOR "DISEÑA TU PROPIA NAVE"
     const simState = { name: 'Mi misión 1', dest: 'Luna', arch: 'rover', mass: 500, decade: 2020 };
 
     const PRESETS = {
@@ -866,8 +989,6 @@
       chandrayaan: { name: 'Chandrayaan-3', dest: 'Luna', arch: 'lander', mass: 1750, decade: 2020 },
       hope: { name: 'Hope (Emiratos)', dest: 'Marte', arch: 'orbiter', mass: 550, decade: 2020 }
     };
-
-    const ARCH_LABEL = { rover: 'Rover', lander: 'Aterrizador', orbiter: 'Orbitador' };
 
     function updateSimView() {
       const craft = document.getElementById('sim-craft-img');
@@ -877,46 +998,66 @@
         setTimeout(() => { craft.src = newSrc; craft.style.opacity = '1'; }, 150);
       }
       craft.alt = ARCH_LABEL[simState.arch];
-
       const dest = document.getElementById('sim-dest-img');
       dest.src = IMG[simState.dest];
       dest.alt = simState.dest;
       document.getElementById('sim-dest-label').textContent = 'Destino: ' + simState.dest;
       document.getElementById('sim-hud-name').textContent = simState.name || 'Mi misión';
-      document.getElementById('sim-hud-data').textContent = `${simState.mass.toLocaleString('es-PE')} kg · ${simState.decade}s`;
+      document.getElementById('sim-hud-data').textContent = simState.mass.toLocaleString('es-PE') + ' kg · ' + simState.decade + 's';
       document.getElementById('sim-caption').textContent = IMG_CAPTION[simState.arch];
     }
 
     function updateSimulator() {
-      const isMars = simState.dest === 'Marte';
-      const isLander = simState.arch !== 'orbiter';
-      const pred = calcPrediction(simState.dest, simState.arch, simState.mass, simState.decade);
+      const isMars = simState.dest === 'Marte' ? 1 : 0;
+      const isLander = simState.arch === 'orbiter' ? 0 : 1;
+      const decC = (simState.decade - 1990) / 10;
 
+      // Modelo AFT Weibull
+      const eta = 6.1725 + 1.6034 * isMars + 0.6360 * decC - 0.5164 * Math.log(simState.mass) + 0.4735 * isLander;
+      const scaleLambda = Math.exp(eta);
+      const medianDays = Math.max(1, Math.round(scaleLambda * Math.pow(Math.log(2), 3.54)));
+
+      // Modelo GLM Gamma
+      const costEst = Math.round(
+        210 *
+        (isMars ? 2.20 : 1.0) *
+        (isLander ? 1.78 : 1.0) *
+        Math.pow(simState.mass / 400, 0.313) *
+        Math.pow(1.061, decC)
+      );
+
+      document.getElementById('sim-mass-label').textContent = 'kg';
       const numEl = document.getElementById('sim-mass-num');
-      if (Number(numEl.value) !== simState.mass) numEl.value = simState.mass;
+      if (numEl && Number(numEl.value) !== simState.mass) numEl.value = simState.mass;
       document.getElementById('sim-decade-label').textContent = 'Años ' + simState.decade;
 
-      document.getElementById('sim-title').textContent = simState.name || 'Mi misión';
-      document.getElementById('sim-subtitle').textContent = `${ARCH_LABEL[simState.arch]} · Destino: ${simState.dest} · Década ${simState.decade}`;
+      const archLabel = simState.arch === 'rover' ? 'Rover' : simState.arch === 'lander' ? 'Aterrizador' : 'Orbitador';
+      document.getElementById('sim-title').textContent = simState.name || 'Mi Nave Espacial';
+      document.getElementById('sim-subtitle').textContent = `${archLabel} · Destino: ${simState.dest} · Década ${simState.decade}`;
 
       const badge = document.getElementById('sim-badge');
       badge.textContent = simState.dest;
-      badge.className = `px-2.5 py-1 text-xs font-bold rounded-sm text-white ${isMars ? 'c-red' : 'c-blue'}`;
+      badge.className = `px-2.5 py-1 text-xs font-bold rounded-sm text-white ${isMars ? 'nasa-red' : 'nasa-blue'}`;
 
       const prof = document.getElementById('sim-profile-badge');
       if (!isMars && simState.mass >= 1200) prof.textContent = 'Perfil: nave lunar pesada';
       else if (simState.decade <= 1970) prof.textContent = 'Perfil: misión pionera';
       else prof.textContent = 'Perfil: larga duración';
 
-      document.getElementById('sim-days').textContent = formatDays(pred.medianDays);
-      document.getElementById('sim-cost').textContent = '$' + pred.costEst.toLocaleString('es-PE') + ' M';
+      let daysStr = medianDays + ' días';
+      if (medianDays >= 365) {
+        const yrs = (medianDays / 365).toFixed(1);
+        daysStr = `${medianDays} días (~${yrs} años)`;
+      }
+      document.getElementById('sim-days').textContent = daysStr;
+      document.getElementById('sim-cost').textContent = '$' + costEst.toLocaleString('es-PE') + ' M';
       document.getElementById('sim-travel').textContent = isMars ? '~180 días' : '~3.6 días';
 
-      let note;
+      let note = '';
       if (simState.decade <= 1970) {
-        note = `Con tecnología de los años ${simState.decade}, la duración esperada es mucho menor que la de una nave actual.`;
+        note = 'Con tecnología de los años ' + simState.decade + ', la duración esperada es mucho menor que la de una nave actual.';
       } else if (isMars && isLander) {
-        note = 'Bajar a la superficie de Marte es la opción más cara, pero las naves recientes que lo lograron siguieron operando durante años.';
+        note = 'Bajar a la superficie de Marte es lo más caro, pero las naves recientes que lo lograron siguieron operando durante años.';
       } else if (!isMars && simState.mass >= 1500) {
         note = 'Las naves muy pesadas enviadas a la Luna suelen ser módulos o etapas diseñadas para misiones cortas.';
       } else {
@@ -929,106 +1070,117 @@
 
     function syncSimButtons() {
       document.querySelectorAll('.sim-dest-btn').forEach(b => {
-        setActive(b, b.dataset.simDest === simState.dest, simState.dest === 'Marte' ? 'c-red' : 'c-blue');
+        const active = b.dataset.simDest === simState.dest;
+        b.classList.toggle('nasa-blue', active && simState.dest === 'Luna');
+        b.classList.toggle('nasa-red', active && simState.dest === 'Marte');
+        b.classList.toggle('text-white', active);
+        b.classList.toggle('border', !active);
+        b.classList.toggle('border-white/25', !active);
+        b.classList.toggle('text-neutral-200', !active);
       });
-      document.querySelectorAll('.sim-arch-btn').forEach(b => setActive(b, b.dataset.simArch === simState.arch, 'c-red'));
+      document.querySelectorAll('.sim-arch-btn').forEach(b => {
+        const active = b.dataset.simArch === simState.arch;
+        b.classList.toggle('nasa-red', active);
+        b.classList.toggle('text-white', active);
+        b.classList.toggle('border', !active);
+        b.classList.toggle('border-white/25', !active);
+        b.classList.toggle('text-neutral-200', !active);
+      });
     }
 
-    function loadIntoSim(p) {
-      simState.name = p.name;
-      simState.dest = p.dest;
-      simState.arch = p.arch;
-      simState.mass = Math.min(8500, p.mass);
-      simState.decade = p.decade;
-      document.getElementById('sim-name').value = p.name;
-      document.getElementById('sim-mass').value = simState.mass;
-      document.getElementById('sim-mass-num').value = simState.mass;
-      document.getElementById('sim-decade').value = p.decade;
-      syncSimButtons();
+    document.getElementById('sim-name').addEventListener('input', e => {
+      simState.name = e.target.value;
       updateSimulator();
-    }
-
-    document.getElementById('sim-name').addEventListener('input', e => { simState.name = e.target.value; updateSimulator(); });
+    });
     document.querySelectorAll('.sim-dest-btn').forEach(btn => {
-      btn.addEventListener('click', () => { simState.dest = btn.dataset.simDest; syncSimButtons(); updateSimulator(); });
+      btn.addEventListener('click', () => {
+        simState.dest = btn.dataset.simDest;
+        syncSimButtons();
+        updateSimulator();
+      });
     });
     document.querySelectorAll('.sim-arch-btn').forEach(btn => {
-      btn.addEventListener('click', () => { simState.arch = btn.dataset.simArch; syncSimButtons(); updateSimulator(); });
+      btn.addEventListener('click', () => {
+        simState.arch = btn.dataset.simArch;
+        syncSimButtons();
+        updateSimulator();
+      });
     });
-    document.getElementById('sim-mass').addEventListener('input', e => { simState.mass = Number(e.target.value); updateSimulator(); });
-    document.getElementById('sim-mass-num').addEventListener('change', e => {
+    document.getElementById('sim-mass').addEventListener('input', e => {
+      simState.mass = Number(e.target.value);
+      updateSimulator();
+    });
+    document.getElementById('sim-mass-num').addEventListener('input', e => {
       const v = Math.max(50, Math.min(8500, Number(e.target.value) || 50));
       simState.mass = v;
       document.getElementById('sim-mass').value = v;
       updateSimulator();
     });
-    document.getElementById('sim-decade').addEventListener('input', e => { simState.decade = Number(e.target.value); updateSimulator(); });
+    document.getElementById('sim-decade').addEventListener('input', e => {
+      simState.decade = Number(e.target.value);
+      updateSimulator();
+    });
     document.querySelectorAll('.preset-btn').forEach(btn => {
-      btn.addEventListener('click', () => { const p = PRESETS[btn.dataset.preset]; if (p) loadIntoSim(p); });
+      btn.addEventListener('click', () => {
+        const p = PRESETS[btn.dataset.preset];
+        if (!p) return;
+        Object.assign(simState, p);
+        document.getElementById('sim-name').value = p.name;
+        document.getElementById('sim-mass').value = p.mass;
+        document.getElementById('sim-mass-num').value = p.mass;
+        document.getElementById('sim-decade').value = p.decade;
+        syncSimButtons();
+        updateSimulator();
+      });
     });
 
     syncSimButtons();
     updateSimulator();
 
-    // ---------- Misiones recientes y próximas ----------
-    // status: 'ok' = funcionó, 'fail' = falló, 'transit' = en camino, 'planned' = por lanzar
+
+    // 7. MISIONES RECIENTES Y FUTURAS
+    // status: ok = funcionó, fail = falló, transit = en camino, planned = por lanzar
     const FUTURE_MISSIONS = [
-      {
-        id: 'blueghost1', name: 'Blue Ghost 1', agency: 'Firefly / NASA', dest: 'Luna', arch: 'lander', mass: 1517, decade: 2020,
-        when: 'Lanzada ene 2025 · Mare Crisium', status: 'ok',
-        result: 'Aterrizó el 2 de marzo de 2025 y operó unos 14 días.',
+      { id: 'blueghost1', name: 'Blue Ghost 1', agency: 'Firefly / NASA', dest: 'Luna', arch: 'lander', mass: 1517, decade: 2020,
+        yearLabel: 'Lanzada 15 ene 2025 · Mare Crisium', status: 'ok',
+        result: 'Aterrizó el 2 de marzo de 2025 y trabajó unos 14 días.',
         url: 'https://en.wikipedia.org/wiki/Blue_Ghost_Mission_1',
-        desc: 'Aterrizador comercial con 10 instrumentos científicos de la NASA.'
-      },
-      {
-        id: 'resilience', name: 'Resilience (M2)', agency: 'ispace (Japón)', dest: 'Luna', arch: 'lander', mass: 1000, decade: 2020,
-        when: 'Lanzada ene 2025 · Mare Frigoris', status: 'fail',
-        result: 'Se estrelló al intentar aterrizar el 6 de junio de 2025.',
+        desc: 'Aterrizador comercial con 10 instrumentos científicos de la NASA.' },
+      { id: 'resilience', name: 'Resilience (M2)', agency: 'ispace (Japón)', dest: 'Luna', arch: 'lander', mass: 1000, decade: 2020,
+        yearLabel: 'Lanzada 15 ene 2025 · Mare Frigoris', status: 'fail',
+        result: 'Se estrelló al intentar aterrizar, en junio de 2025.',
         url: 'https://en.wikipedia.org/wiki/Hakuto-R_Mission_2',
-        desc: 'Aterrizador japonés que llevaba el mini-rover Tenacious.'
-      },
-      {
-        id: 'trailblazer', name: 'Lunar Trailblazer', agency: 'NASA / Caltech', dest: 'Luna', arch: 'orbiter', mass: 200, decade: 2020,
-        when: 'Lanzado 26 feb 2025', status: 'fail',
-        result: 'Perdió contacto al día siguiente del lanzamiento; la NASA cerró la misión en julio de 2025.',
-        url: 'https://science.nasa.gov/mission/lunar-trailblazer/',
-        desc: 'Orbitador pequeño pensado para mapear agua en la superficie lunar.'
-      },
-      {
-        id: 'pathfinder', name: 'Lunar Pathfinder', agency: 'ESA / SSTL', dest: 'Luna', arch: 'orbiter', mass: 300, decade: 2020,
-        when: 'Lanzamiento previsto: 2027', status: 'planned',
+        desc: 'Aterrizador japonés que llevaba el micro-rover Tenacious.' },
+      { id: 'trailblazer', name: 'Lunar Trailblazer', agency: 'NASA / Caltech', dest: 'Luna', arch: 'orbiter', mass: 200, decade: 2020,
+        yearLabel: 'Lanzado 26 feb 2025', status: 'fail',
+        result: 'Perdió contacto al día siguiente del lanzamiento y la NASA dio por terminada la misión.',
+        url: 'https://science.nasa.gov/mission/lunar-trailblazer/lunar-trailblazer-fact-sheet/',
+        desc: 'Orbitador pequeño pensado para mapear agua en la superficie lunar.' },
+      { id: 'pathfinder', name: 'Lunar Pathfinder', agency: 'ESA / SSTL', dest: 'Luna', arch: 'orbiter', mass: 300, decade: 2020,
+        yearLabel: 'Aún sin lanzar', status: 'planned',
         result: 'Viajará junto a la misión Blue Ghost 2.',
-        url: 'https://en.wikipedia.org/wiki/Lunar_Pathfinder',
-        desc: 'Satélite de comunicaciones para misiones en el polo sur y la cara oculta.'
-      },
-      {
-        id: 'change7', name: "Chang'e 7", agency: 'CNSA (China)', dest: 'Luna', arch: 'lander', mass: 8200, decade: 2020,
-        when: 'Aplazada a 2027 · Polo Sur', status: 'planned',
-        result: 'El lanzamiento de agosto de 2026 se suspendió y pasó a 2027.',
+        url: 'https://www.eoportal.org/satellite-missions/lunar-pathfinder',
+        desc: 'Satélite de comunicaciones y navegación para misiones al polo sur y la cara oculta.' },
+      { id: 'change7', name: "Chang'e 7", agency: 'CNSA (China)', dest: 'Luna', arch: 'lander', mass: 8200, decade: 2020,
+        yearLabel: 'Prevista 2027 · Polo Sur', status: 'planned',
+        result: 'Todavía no se lanza.',
         url: 'https://en.wikipedia.org/wiki/Chang%27e_7',
-        desc: 'Orbitador, aterrizador, rover y saltador para buscar hielo de agua.'
-      },
-      {
-        id: 'escapade', name: 'ESCAPADE', agency: 'NASA / Rocket Lab', dest: 'Marte', arch: 'orbiter', mass: 535, decade: 2020,
-        when: 'Lanzada nov 2025 · Llega sep 2027', status: 'transit',
-        result: 'En camino: pasó cerca de la Tierra el 7 y 9 de noviembre de 2026 para impulsarse hacia Marte.',
-        url: 'https://science.nasa.gov/mission/escapade/',
-        desc: 'Dos satélites gemelos (535 kg cada uno) para estudiar el efecto del viento solar en Marte.'
-      },
-      {
-        id: 'mmx', name: 'MMX (Fobos)', agency: 'JAXA (Japón)', dest: 'Marte', arch: 'lander', mass: 4480, decade: 2020,
-        when: 'Lanzada 20 oct 2026 · Llega 2027', status: 'transit',
-        result: 'En camino a Marte; debe traer muestras de Fobos a la Tierra.',
+        desc: 'Orbitador, aterrizador, rover y saltador para buscar hielo de agua.' },
+      { id: 'escapade', name: 'ESCAPADE', agency: 'NASA / Rocket Lab', dest: 'Marte', arch: 'orbiter', mass: 535, decade: 2020,
+        yearLabel: 'Lanzada nov 2025 · Llegada en 2027', status: 'transit',
+        result: 'En camino a Marte.',
+        url: 'https://en.wikipedia.org/wiki/ESCAPADE',
+        desc: 'Dos satélites gemelos (535 kg cada uno) para estudiar cómo el viento solar afecta a Marte.' },
+      { id: 'mmx', name: 'MMX (Fobos)', agency: 'JAXA (Japón)', dest: 'Marte', arch: 'lander', mass: 4480, decade: 2020,
+        yearLabel: 'Lanzada 20 oct 2026 · Llegada en ago 2027', status: 'transit',
+        result: 'En camino. Debe traer muestras de Fobos a la Tierra en 2031.',
         url: 'https://en.wikipedia.org/wiki/Martian_Moons_eXploration',
-        desc: 'Sonda japonesa que lleva el rover Idefix para bajar a la luna Fobos.'
-      },
-      {
-        id: 'rosalind', name: 'Rosalind Franklin', agency: 'ESA (Europa)', dest: 'Marte', arch: 'rover', mass: 310, decade: 2020,
-        when: 'Lanzamiento fines de 2028 · Llegada 2030', status: 'planned',
-        result: 'Despegará en un Falcon Heavy desde Florida.',
+        desc: 'Sonda japonesa que lleva el rover Idefix para estudiar la luna Fobos.' },
+      { id: 'rosalind', name: 'Rosalind Franklin', agency: 'ESA (Europa)', dest: 'Marte', arch: 'rover', mass: 310, decade: 2020,
+        yearLabel: 'Lanzamiento 2028 · Llegada 2030', status: 'planned',
+        result: 'Todavía no se lanza.',
         url: 'https://en.wikipedia.org/wiki/Rosalind_Franklin_(rover)',
-        desc: 'Rover europeo con un taladro de 2 metros para buscar rastros de vida pasada.'
-      }
+        desc: 'Rover europeo con un taladro de 2 metros para buscar señales de vida pasada.' }
     ];
 
     const STATUS_STYLE = {
@@ -1037,6 +1189,16 @@
       transit: { label: 'Estado actual', cls: 'border-sky-400 text-sky-300' },
       planned: { label: 'Estado actual', cls: 'border-neutral-500 text-neutral-300' }
     };
+
+    function calcPrediction(dest, arch, mass, decade) {
+      const isMars = dest === 'Marte' ? 1 : 0;
+      const isLander = arch === 'orbiter' ? 0 : 1;
+      const decC = (decade - 1990) / 10;
+      const eta = 6.1725 + 1.6034 * isMars + 0.6360 * decC - 0.5164 * Math.log(mass) + 0.4735 * isLander;
+      const medianDays = Math.max(1, Math.round(Math.exp(eta) * Math.pow(Math.log(2), 3.54)));
+      const costEst = Math.round(210 * (isMars ? 2.20 : 1.0) * (isLander ? 1.78 : 1.0) * Math.pow(mass / 400, 0.313) * Math.pow(1.061, decC));
+      return { medianDays, costEst };
+    }
 
     let activeFutFilter = 'all';
 
@@ -1047,29 +1209,29 @@
 
       container.innerHTML = list.map(m => {
         const pred = calcPrediction(m.dest, m.arch, m.mass, m.decade);
-        const badgeCls = m.dest === 'Marte' ? 'c-red' : 'c-blue';
+        const badgeCls = m.dest === 'Marte' ? 'nasa-red' : 'nasa-blue';
         const st = STATUS_STYLE[m.status];
         return `
           <article class="panel overflow-hidden flex flex-col justify-between">
             <div>
               <div class="relative h-36 bg-black overflow-hidden">
-                <img src="${IMG[m.arch]}" alt="Imagen referencial de un ${ARCH_LABEL[m.arch].toLowerCase()}" loading="lazy" class="w-full h-full object-cover opacity-85" />
+                <img src="${IMG[m.arch]}" alt="Imagen referencial de un ${ARCH_LABEL[m.arch].toLowerCase()}" loading="lazy" class="w-full h-full object-cover opacity-90" />
                 <img src="${IMG[m.dest]}" alt="" class="absolute bottom-2 left-2 h-9 w-9 rounded-full object-cover border border-white/40" />
                 <span class="absolute top-2.5 right-2.5 px-2 py-0.5 text-[10px] font-bold text-white rounded-sm ${badgeCls}">${m.dest} · ${ARCH_LABEL[m.arch]}</span>
               </div>
               <div class="p-4 space-y-2">
-                <p class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">${m.when}</p>
-                <h3 class="text-base font-extrabold">${m.name}</h3>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-neutral-400">${m.yearLabel}</p>
+                <h3 class="text-base font-extrabold text-white">${m.name}</h3>
                 <p class="text-[11px] font-semibold text-neutral-400">${m.agency} · ${m.mass.toLocaleString('es-PE')} kg</p>
                 <p class="text-xs text-neutral-300 leading-relaxed">${m.desc}</p>
                 <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/10">
                   <div>
                     <span class="block text-[10px] uppercase font-bold text-neutral-400">Duración est.</span>
-                    <span class="text-sm font-extrabold">${formatDays(pred.medianDays).replace(/ \(.*\)/, '')}</span>
+                    <span class="text-sm font-extrabold text-white">${pred.medianDays.toLocaleString('es-PE')} días</span>
                   </div>
                   <div>
                     <span class="block text-[10px] uppercase font-bold text-neutral-400">Costo est.</span>
-                    <span class="text-sm font-extrabold">$${pred.costEst.toLocaleString('es-PE')} M</span>
+                    <span class="text-sm font-extrabold text-white">$${pred.costEst.toLocaleString('es-PE')} M</span>
                   </div>
                 </div>
                 <div class="border-l-2 pl-2.5 ${st.cls}">
@@ -1080,7 +1242,7 @@
             </div>
             <div class="px-4 pb-4 flex items-center justify-between gap-2">
               <button type="button" data-future-id="${m.id}" class="load-future-btn px-3 py-1.5 rounded-sm bg-white/10 hover:bg-white/20 text-white text-[11px] font-bold transition">Abrir en el simulador</button>
-              <a href="${m.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-red-300 hover:underline">Ficha</a>
+              <a href="${m.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-red-400 hover:underline">Ficha</a>
             </div>
           </article>
         `;
@@ -1090,7 +1252,17 @@
         btn.addEventListener('click', () => {
           const m = FUTURE_MISSIONS.find(x => x.id === btn.dataset.futureId);
           if (!m) return;
-          loadIntoSim(m);
+          simState.name = m.name;
+          simState.dest = m.dest;
+          simState.arch = m.arch;
+          simState.mass = Math.min(8500, m.mass);
+          simState.decade = m.decade;
+          document.getElementById('sim-name').value = m.name;
+          document.getElementById('sim-mass').value = simState.mass;
+          document.getElementById('sim-mass-num').value = simState.mass;
+          document.getElementById('sim-decade').value = m.decade;
+          syncSimButtons();
+          updateSimulator();
           document.getElementById('simulador').scrollIntoView({ behavior: 'smooth' });
         });
       });
@@ -1099,7 +1271,14 @@
     document.querySelectorAll('.fut-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         activeFutFilter = btn.dataset.futFilter;
-        document.querySelectorAll('.fut-filter-btn').forEach(b => setActive(b, b.dataset.futFilter === activeFutFilter, 'c-red'));
+        document.querySelectorAll('.fut-filter-btn').forEach(b => {
+          const active = b.dataset.futFilter === activeFutFilter;
+          b.classList.toggle('nasa-red', active);
+          b.classList.toggle('text-white', active);
+          b.classList.toggle('border', !active);
+          b.classList.toggle('border-white/25', !active);
+          b.classList.toggle('text-neutral-200', !active);
+        });
         renderFutureMissions();
       });
     });
